@@ -6,6 +6,7 @@ import AiScanning from './screens/AiScanning'
 import Overview from './screens/Overview'
 import CandidateAnalysis from './screens/CandidateAnalysis'
 import { CANDIDATES } from './data/candidates'
+import { generateExcelReport } from './utils/exportReport'
 
 type Screen = 'analysis' | 'scanning' | 'overview' | 'candidate'
 
@@ -46,7 +47,7 @@ export default function App() {
         onNewAnalysis={handleNewAnalysis}
       />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <TopBar onNewAnalysis={handleNewAnalysis} />
+        <TopBar onNewAnalysis={handleNewAnalysis} onExportReport={generateExcelReport} />
         <main className="flex-1 overflow-y-auto min-h-0">
           {screen === 'overview' && (
             <Overview

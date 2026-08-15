@@ -84,13 +84,54 @@ function MatchBar({ label, value, delay = 0 }: { label: string; value: number; d
 export default function CandidateAnalysis({ candidate, onBack }: CandidateAnalysisProps) {
   const initColor = getInitialsColor(candidate.initials)
 
+  const jobRequirements = [
+    { skill: 'Python', status: 'Strong' as const },
+    { skill: 'Machine Learning', status: 'Strong' as const },
+    { skill: 'TensorFlow', status: 'Strong' as const },
+    { skill: 'SQL', status: 'Strong' as const },
+    { skill: 'Docker', status: 'Good' as const },
+    { skill: 'AWS', status: 'Limited' as const },
+    { skill: 'Kubernetes', status: 'Missing' as const },
+  ]
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'Strong':
+        return <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5 5-5.5" stroke="#10B981" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      case 'Good':
+        return <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l2.5 2.5 5-5.5" stroke="#635BFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      case 'Limited':
+        return <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 2v4M6 8.5v1.5" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round" /></svg>
+      case 'Missing':
+        return <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 2l8 8M10 2l-8 8" stroke="#EF4444" strokeWidth="1.5" strokeLinecap="round" /></svg>
+    }
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Strong': return '#10B981'
+      case 'Good': return '#635BFF'
+      case 'Limited': return '#F59E0B'
+      case 'Missing': return '#EF4444'
+    }
+  }
+
+  const getStatusBg = (status: string) => {
+    switch (status) {
+      case 'Strong': return '#F0FDF4'
+      case 'Good': return '#EEF0FF'
+      case 'Limited': return '#FFFBEB'
+      case 'Missing': return '#FEF2F2'
+    }
+  }
+
   return (
     <div className="p-6 max-w-none animate-fade-in-up">
       {/* Back + header */}
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={onBack}
-          className="flex items-center gap-1.5 text-[13px] font-500 text-[#6B7280] hover:text-[#111827] transition-colors"
+          className="flex items-center gap-1.5 text-[13px] font-500 text-[#6B7280] hover:text-[#111827] transition-all duration-200 hover-scale"
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M9 11L5 7l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -103,8 +144,7 @@ export default function CandidateAnalysis({ candidate, onBack }: CandidateAnalys
 
       {/* Candidate hero */}
       <div
-        className="bg-white rounded-xl border border-[#E5E7EB] p-6 mb-5 flex items-center gap-6"
-        style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
+        className="bg-white rounded-lg border border-[#E5E7EB] p-6 mb-5 flex items-center gap-6"
       >
         <div
           className="w-16 h-16 rounded-xl text-[20px] font-800 text-white flex items-center justify-center flex-shrink-0"
@@ -144,79 +184,54 @@ export default function CandidateAnalysis({ candidate, onBack }: CandidateAnalys
       {/* Main 3-column layout */}
       <div className="grid grid-cols-3 gap-5 mb-5">
         {/* Match gauge + breakdown */}
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-5" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-5">
           <h3 className="text-[13px] font-700 text-[#111827] mb-1">Match Score</h3>
           <MatchGauge match={candidate.match} label="Overall" />
           <div className="border-t border-[#F3F4F6] pt-4 mt-2 space-y-4">
             <h4 className="text-[12px] font-600 text-[#9CA3AF] uppercase tracking-wider">Match Breakdown</h4>
-            <MatchBar label="Semantic Match" value={candidate.semanticMatch} delay={0} />
-            <MatchBar label="Skill Match" value={candidate.skillMatch} delay={100} />
-            <MatchBar label="Experience Match" value={candidate.experienceMatch} delay={200} />
+            <MatchBar label="Semantic Fit" value={candidate.semanticMatch} delay={0} />
+            <MatchBar label="Technical Skills" value={candidate.skillMatch} delay={100} />
+            <MatchBar label="Experience" value={candidate.experienceMatch} delay={200} />
           </div>
         </div>
 
-        {/* Skills */}
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-5" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-          <div className="space-y-5">
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-5 h-5 rounded bg-[#F0FDF4] flex items-center justify-center">
-                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                    <path d="M2 5l2 2 4-4" stroke="#10B981" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-                <h3 className="text-[13px] font-700 text-[#111827]">Matching Skills</h3>
-                <span className="text-[11px] font-600 text-[#10B981] bg-[#F0FDF4] px-1.5 py-0.5 rounded-full">
-                  {candidate.skills.length}
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {candidate.skills.map((s) => (
-                  <span
-                    key={s}
-                    className="text-[12px] font-500 bg-[#F0FDF4] text-[#10B981] border border-[#D1FAE5] px-2.5 py-1 rounded-lg"
-                  >
-                    {s}
-                  </span>
-                ))}
-              </div>
+        {/* Requirement Coverage */}
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-5">
+          <h3 className="text-[13px] font-700 text-[#111827] mb-4">Requirement Coverage</h3>
+          <div className="space-y-2">
+            <div className="grid grid-cols-[1fr_auto] gap-2 text-[11px] font-600 text-[#9CA3AF] uppercase tracking-wider mb-2">
+              <span>Job Requirement</span>
+              <span>Candidate</span>
             </div>
-
-            {candidate.missingSkills.length > 0 && (
-              <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-5 h-5 rounded bg-[#FEF2F2] flex items-center justify-center">
-                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                      <path d="M2 2l6 6M8 2l-6 6" stroke="#EF4444" strokeWidth="1.5" strokeLinecap="round" />
-                    </svg>
+            {jobRequirements.map((req) => (
+              <div key={req.skill} className="flex items-center justify-between py-2 border-b border-[#F3F4F6] last:border-0">
+                <span className="text-[12px] font-500 text-[#374151]">{req.skill}</span>
+                <div className="flex items-center gap-1.5">
+                  <div
+                    className="flex items-center justify-center w-5 h-5 rounded"
+                    style={{ backgroundColor: getStatusBg(req.status) }}
+                  >
+                    {getStatusIcon(req.status)}
                   </div>
-                  <h3 className="text-[13px] font-700 text-[#111827]">Missing Skills</h3>
-                  <span className="text-[11px] font-600 text-[#EF4444] bg-[#FEF2F2] px-1.5 py-0.5 rounded-full">
-                    {candidate.missingSkills.length}
+                  <span
+                    className="text-[11px] font-600 px-2 py-0.5 rounded-full"
+                    style={{
+                      color: getStatusColor(req.status),
+                      backgroundColor: getStatusBg(req.status),
+                    }}
+                  >
+                    {req.status}
                   </span>
                 </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {candidate.missingSkills.map((s) => (
-                    <span
-                      key={s}
-                      className="text-[12px] font-500 bg-[#FEF2F2] text-[#EF4444] border border-[#FECACA] px-2.5 py-1 rounded-lg"
-                    >
-                      {s}
-                    </span>
-                  ))}
-                </div>
               </div>
-            )}
+            ))}
           </div>
         </div>
 
         {/* AI Insight */}
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-5" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-5">
           <div className="flex items-center gap-2 mb-4">
-            <div
-              className="w-6 h-6 rounded-lg flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, #635BFF 0%, #8B84FF 100%)' }}
-            >
+            <div className="w-6 h-6 rounded-lg flex items-center justify-center bg-[#635BFF]">
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                 <path d="M6 1.5L7 4.5H10L7.5 6.5L8.5 9.5L6 7.5L3.5 9.5L4.5 6.5L2 4.5H5L6 1.5Z" fill="white" />
               </svg>
@@ -224,10 +239,7 @@ export default function CandidateAnalysis({ candidate, onBack }: CandidateAnalys
             <h3 className="text-[13px] font-700 text-[#111827]">AI Insight</h3>
           </div>
 
-          <div
-            className="rounded-xl p-4 text-[13px] text-[#374151] leading-relaxed"
-            style={{ background: 'linear-gradient(135deg, #F7F8FF 0%, #EEF0FF 100%)', border: '1px solid #E0E2FF' }}
-          >
+          <div className="rounded-xl p-4 text-[13px] text-[#374151] leading-relaxed bg-[#F7F8FF] border border-[#E0E2FF]">
             <svg width="20" height="14" viewBox="0 0 20 14" fill="none" className="mb-2 opacity-30">
               <path d="M0 14V8.4C0 5.6 0.8 3.4 2.4 1.8 4 0.6 6.4 0 9.6 0v2.4C7.6 2.4 6.2 3 5.4 4.2 4.6 5 4.2 6.4 4.2 8H8V14H0ZM12 14V8.4C12 5.6 12.8 3.4 14.4 1.8 16 0.6 18.4 0 21.6 0v2.4C19.6 2.4 18.2 3 17.4 4.2 16.6 5 16.2 6.4 16.2 8H20V14H12Z" fill="#635BFF" />
             </svg>
@@ -261,7 +273,7 @@ export default function CandidateAnalysis({ candidate, onBack }: CandidateAnalys
       {/* Education + Experience + Projects */}
       <div className="grid grid-cols-3 gap-5">
         {/* Education */}
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-5" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-5">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-5 h-5 rounded bg-[#EEF0FF] flex items-center justify-center">
               <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
@@ -283,7 +295,7 @@ export default function CandidateAnalysis({ candidate, onBack }: CandidateAnalys
         </div>
 
         {/* Experience */}
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-5" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-5">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-5 h-5 rounded bg-[#EEF0FF] flex items-center justify-center">
               <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
@@ -312,7 +324,7 @@ export default function CandidateAnalysis({ candidate, onBack }: CandidateAnalys
         </div>
 
         {/* Projects */}
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-5" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-5">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-5 h-5 rounded bg-[#EEF0FF] flex items-center justify-center">
               <svg width="11" height="11" viewBox="0 0 11 11" fill="none">

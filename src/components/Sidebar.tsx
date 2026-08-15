@@ -70,18 +70,15 @@ export default function Sidebar({ activeTab, onTabChange, onNewAnalysis }: Sideb
       {/* Logo */}
       <div className="px-5 py-5 border-b border-[#E5E7EB]">
         <div className="flex items-center gap-2.5">
-          <div
-            className="w-7 h-7 rounded-lg flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, #635BFF 0%, #8B84FF 100%)' }}
-          >
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#635BFF]">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <circle cx="7" cy="7" r="3" fill="white" opacity="0.9" />
-              <path d="M7 1v2M7 11v2M1 7h2M11 7h2M3.22 3.22l1.41 1.41M9.37 9.37l1.41 1.41M10.78 3.22l-1.41 1.41M4.63 9.37l-1.41 1.41" stroke="white" strokeWidth="1.2" strokeLinecap="round" opacity="0.7" />
+              <circle cx="7" cy="7" r="3" fill="white" opacity="0.95" />
+              <path d="M7 1v2M7 11v2M1 7h2M11 7h2M3.22 3.22l1.41 1.41M9.37 9.37l1.41 1.41M10.78 3.22l-1.41 1.41M4.63 9.37l-1.41 1.41" stroke="white" strokeWidth="1.2" strokeLinecap="round" opacity="0.6" />
             </svg>
           </div>
           <div>
             <div className="text-[12px] font-700 text-[#111827] leading-tight">RecruitAI</div>
-            <div className="text-[10px] text-[#9CA3AF] font-400">Powered by AI</div>
+            <div className="text-[10px] text-[#9CA3AF] font-400">Intelligent Hiring</div>
           </div>
         </div>
       </div>
@@ -117,8 +114,7 @@ export default function Sidebar({ activeTab, onTabChange, onNewAnalysis }: Sideb
       <div className="px-3 py-4 border-t border-[#E5E7EB]">
         <button
           onClick={onNewAnalysis}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-[13px] font-600 text-white transition-all duration-150 hover:opacity-90 active:scale-[0.98]"
-          style={{ background: 'linear-gradient(135deg, #635BFF 0%, #8B84FF 100%)' }}
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-[13px] font-600 text-white transition-all duration-150 hover:opacity-90 active:scale-[0.98] bg-[#635BFF]"
         >
           <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
             <path d="M6.5 1.5v10M1.5 6.5h10" stroke="white" strokeWidth="2" strokeLinecap="round" />

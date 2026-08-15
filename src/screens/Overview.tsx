@@ -50,8 +50,8 @@ function KpiCard({
   const displayed = useCountUp(value, 900)
   return (
     <div
-      className="bg-white rounded-xl border border-[#E5E7EB] p-5 animate-fade-in-up"
-      style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)', animationDelay: `${delay}s` }}
+      className="bg-white rounded-lg border border-[#E5E7EB] p-5 animate-fade-in-up"
+      style={{ animationDelay: `${delay}s` }}
     >
       <div className="flex items-start justify-between mb-4">
         <div className="w-9 h-9 rounded-lg bg-[#F7F8FA] flex items-center justify-center">{icon}</div>
@@ -186,9 +186,8 @@ export default function Overview({ activeTab, onSelectCandidate }: OverviewProps
           }
         />
         <KpiCard
-          label="Shortlisted"
+          label="Strong Matches"
           value={12}
-          change="+3 today"
           delay={0.06}
           icon={
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -200,7 +199,6 @@ export default function Overview({ activeTab, onSelectCandidate }: OverviewProps
           label="Average Match"
           value={84}
           suffix="%"
-          change="↑ 6%"
           delay={0.12}
           icon={
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -210,12 +208,12 @@ export default function Overview({ activeTab, onSelectCandidate }: OverviewProps
           }
         />
         <KpiCard
-          label="Skills Identified"
-          value={18}
+          label="Critical Skill Gaps"
+          value={3}
           delay={0.18}
           icon={
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M9 2.5L10.5 7H15L11.25 9.75L12.75 14.25L9 11.5L5.25 14.25L6.75 9.75L3 7H7.5L9 2.5Z" stroke="#8B84FF" strokeWidth="1.4" strokeLinejoin="round" fill="none" />
+              <path d="M9 1L11 7H17L12 11L14 17L9 13L4 17L6 11L1 7H7L9 1Z" stroke="#EF4444" strokeWidth="1.4" strokeLinejoin="round" fill="none" />
             </svg>
           }
         />
@@ -223,73 +221,82 @@ export default function Overview({ activeTab, onSelectCandidate }: OverviewProps
 
       {/* Middle row */}
       <div className="grid grid-cols-5 gap-4">
-        {/* Bar chart */}
+        {/* Candidate Fit Matrix */}
         <div
-          className="col-span-3 bg-white rounded-xl border border-[#E5E7EB] p-5"
-          style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
+          className="col-span-3 bg-white rounded-lg border border-[#E5E7EB] p-5"
         >
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-[14px] font-700 text-[#111827]">Match Score Distribution</h3>
-              <p className="text-[12px] text-[#9CA3AF] mt-0.5">42 candidates analyzed</p>
+              <h3 className="text-[14px] font-700 text-[#111827]">Candidate Fit Matrix</h3>
+              <p className="text-[12px] text-[#9CA3AF] mt-0.5">Comprehensive match analysis</p>
             </div>
-            <div className="flex items-center gap-3 text-[11px] text-[#9CA3AF]">
-              <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-sm bg-[#10B981]" />
-                Strong
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-sm bg-[#F59E0B]" />
-                Moderate
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-sm bg-[#EF4444]" />
-                Weak
-              </span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="text-[11px] font-600 text-[#9CA3AF] uppercase tracking-wider">
+                  <th className="text-left pb-3 font-500">Candidate</th>
+                  <th className="text-right pb-3 font-500">Semantic Fit</th>
+                  <th className="text-right pb-3 font-500">Skill Match</th>
+                  <th className="text-right pb-3 font-500">Experience</th>
+                  <th className="text-right pb-3 font-500">Overall</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#F3F4F6]">
+                {topCandidates.map((c, idx) => (
+                  <tr
+                    key={c.id}
+                    onClick={() => onSelectCandidate(c.id)}
+                    className="group cursor-pointer hover:bg-[#F7F8FA] transition-all duration-200 hover-scale"
+                  >
+                    <td className="py-2.5">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 flex-shrink-0 text-[10px] font-700 text-white rounded-full flex items-center justify-center" style={{ backgroundColor: getInitialsColor(c.initials) }}>
+                          {c.initials}
+                        </div>
+                        <span className="text-[12px] font-600 text-[#111827] group-hover:text-[#635BFF] transition-colors">
+                          {c.name}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-2.5 text-right">
+                      <span className="text-[12px] font-700" style={{ color: getMatchColor(c.semanticMatch) }}>
+                        {c.semanticMatch}%
+                      </span>
+                    </td>
+                    <td className="py-2.5 text-right">
+                      <span className="text-[12px] font-700" style={{ color: getMatchColor(c.skillMatch) }}>
+                        {c.skillMatch}%
+                      </span>
+                    </td>
+                    <td className="py-2.5 text-right">
+                      <span className="text-[12px] font-700" style={{ color: getMatchColor(c.experienceMatch) }}>
+                        {c.experienceMatch}%
+                      </span>
+                    </td>
+                    <td className="py-2.5 text-right">
+                      <span className="text-[13px] font-800" style={{ color: getMatchColor(c.match) }}>
+                        {c.match}%
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Match Distribution */}
+        <div
+          className="col-span-2 bg-white rounded-lg border border-[#E5E7EB] p-5"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-[14px] font-700 text-[#111827]">Match Distribution</h3>
+              <p className="text-[12px] text-[#9CA3AF] mt-0.5">42 candidates analyzed</p>
             </div>
           </div>
           <BarChart />
-        </div>
-
-        {/* Top candidates */}
-        <div
-          className="col-span-2 bg-white rounded-xl border border-[#E5E7EB] p-5"
-          style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-[14px] font-700 text-[#111827]">Top Candidates</h3>
-            <button
-              onClick={() => {}}
-              className="text-[12px] text-[#635BFF] font-500 hover:underline"
-            >
-              View all
-            </button>
-          </div>
-          <div className="space-y-3">
-            {topCandidates.map((c, idx) => (
-              <button
-                key={c.id}
-                onClick={() => onSelectCandidate(c.id)}
-                className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-[#F7F8FA] transition-colors text-left group"
-              >
-                <div className="w-7 h-7 flex-shrink-0 text-[11px] font-700 text-white rounded-full flex items-center justify-center" style={{ backgroundColor: getInitialsColor(c.initials) }}>
-                  {c.initials}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-[12px] font-600 text-[#111827] truncate group-hover:text-[#635BFF] transition-colors">
-                    {c.name}
-                  </div>
-                  <div className="text-[11px] text-[#9CA3AF] truncate">{c.title}</div>
-                </div>
-                <div className="flex-shrink-0 text-right">
-                  <div className="text-[13px] font-700" style={{ color: getMatchColor(c.match) }}>
-                    {c.match}%
-                  </div>
-                  <div className="text-[10px] text-[#9CA3AF]">#{idx + 1}</div>
-                </div>
-              </button>
-            ))}
-          </div>
         </div>
       </div>
 
@@ -297,36 +304,39 @@ export default function Overview({ activeTab, onSelectCandidate }: OverviewProps
       <div className="grid grid-cols-3 gap-4">
         {/* Candidate ranking table */}
         <div
-          className="col-span-2 bg-white rounded-xl border border-[#E5E7EB] overflow-hidden"
-          style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
+          className="col-span-2 bg-white rounded-lg border border-[#E5E7EB] overflow-hidden"
         >
           <div className="px-5 py-4 border-b border-[#F3F4F6] flex items-center justify-between">
             <div>
               <h3 className="text-[14px] font-700 text-[#111827]">Candidate Ranking</h3>
-              <p className="text-[12px] text-[#9CA3AF] mt-0.5">Sorted by match score</p>
+              <p className="text-[12px] text-[#9CA3AF] mt-0.5">Sorted by overall match score</p>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1.5 text-[12px] text-[#6B7280] bg-[#F7F8FA] px-3 py-1.5 rounded-lg border border-[#E5E7EB]">
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                  <circle cx="5.5" cy="5.5" r="4" stroke="#6B7280" strokeWidth="1.2" fill="none" />
-                  <path d="M10 10l-1.5-1.5" stroke="#6B7280" strokeWidth="1.2" strokeLinecap="round" />
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search candidates..."
+                  className="w-48 pl-8 pr-3 py-1.5 text-[12px] border border-[#E5E7EB] rounded-lg focus:outline-none focus:border-[#635BFF] focus:ring-1 focus:ring-[#635BFF]"
+                />
+                <svg className="absolute left-2.5 top-1/2 -translate-y-1/2" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <circle cx="5.5" cy="5.5" r="4" stroke="#9CA3AF" strokeWidth="1.2" fill="none" />
+                  <path d="M10 10l-1.5-1.5" stroke="#9CA3AF" strokeWidth="1.2" strokeLinecap="round" />
                 </svg>
-                Search
               </div>
-              <div className="flex items-center gap-1.5 text-[12px] text-[#6B7280] bg-[#F7F8FA] px-3 py-1.5 rounded-lg border border-[#E5E7EB]">
+              <button className="flex items-center gap-1.5 text-[12px] text-[#6B7280] bg-[#F7F8FA] px-3 py-1.5 rounded-lg border border-[#E5E7EB] hover:bg-[#F3F4F6] transition-colors">
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                   <path d="M1 3h10M3 6h6M5 9h2" stroke="#6B7280" strokeWidth="1.2" strokeLinecap="round" />
                 </svg>
                 Filter
-              </div>
+              </button>
             </div>
           </div>
 
           {/* Table header */}
           <div className="grid grid-cols-[40px_1fr_100px_1fr_90px_110px] px-5 py-2.5 bg-[#F7F8FA] border-b border-[#F3F4F6] text-[11px] font-600 text-[#9CA3AF] uppercase tracking-wider">
-            <span>#</span>
+            <span>Rank</span>
             <span>Candidate</span>
-            <span>Match</span>
+            <span>Overall</span>
             <span>Top Skills</span>
             <span>Exp.</span>
             <span>Status</span>
@@ -338,7 +348,7 @@ export default function Overview({ activeTab, onSelectCandidate }: OverviewProps
               <button
                 key={c.id}
                 onClick={() => onSelectCandidate(c.id)}
-                className="w-full grid grid-cols-[40px_1fr_100px_1fr_90px_110px] items-center px-5 py-3 hover:bg-[#F7F8FF] transition-colors text-left group"
+                className="w-full grid grid-cols-[40px_1fr_100px_1fr_90px_110px] items-center px-5 py-3 hover:bg-[#F7F8FF] transition-all duration-200 text-left group hover-scale"
               >
                 <span className="text-[12px] font-600 text-[#9CA3AF]">{idx + 1}</span>
 
@@ -390,8 +400,7 @@ export default function Overview({ activeTab, onSelectCandidate }: OverviewProps
 
         {/* Skill analysis */}
         <div
-          className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden"
-          style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
+          className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden"
         >
           <div className="px-5 py-4 border-b border-[#F3F4F6]">
             <h3 className="text-[14px] font-700 text-[#111827]">Skill Coverage</h3>
@@ -411,7 +420,7 @@ export default function Overview({ activeTab, onSelectCandidate }: OverviewProps
                 </div>
                 <div className="w-full bg-[#F3F4F6] rounded-full h-1.5 overflow-hidden">
                   <div
-                    className="h-full rounded-full bar-grow"
+                    className="h-full rounded-full animate-progress-smooth"
                     style={{
                       '--target-width': `${item.coverage}%`,
                       width: `${item.coverage}%`,
@@ -440,8 +449,7 @@ function CandidatesTab({ onSelectCandidate }: { onSelectCandidate: (id: number) 
         <p className="text-[13px] text-[#6B7280] mt-0.5">8 candidates · Ranked by AI match score</p>
       </div>
       <div
-        className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden"
-        style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
+        className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden"
       >
         <div className="grid grid-cols-[48px_1fr_120px_1fr_100px_120px_140px] px-6 py-3 bg-[#F7F8FA] border-b border-[#E5E7EB] text-[11px] font-600 text-[#9CA3AF] uppercase tracking-wider">
           <span>Rank</span>
@@ -457,7 +465,7 @@ function CandidatesTab({ onSelectCandidate }: { onSelectCandidate: (id: number) 
             <button
               key={c.id}
               onClick={() => onSelectCandidate(c.id)}
-              className="w-full grid grid-cols-[48px_1fr_120px_1fr_100px_120px_140px] items-center px-6 py-4 hover:bg-[#F7F8FF] transition-colors text-left group"
+              className="w-full grid grid-cols-[48px_1fr_120px_1fr_100px_120px_140px] items-center px-6 py-4 hover:bg-[#F7F8FF] transition-all duration-200 text-left group hover-scale"
             >
               <div className="flex items-center justify-center w-7 h-7 rounded-full bg-[#F7F8FA] text-[12px] font-700 text-[#6B7280]">
                 {idx + 1}
@@ -502,7 +510,7 @@ function SkillsTab() {
         <p className="text-[13px] text-[#6B7280] mt-0.5">Coverage breakdown across all candidates</p>
       </div>
       <div className="grid grid-cols-2 gap-4">
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-5" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-5">
           <h3 className="text-[14px] font-700 text-[#111827] mb-4">Required Skills Coverage</h3>
           <div className="space-y-5">
             {SKILLS_ANALYSIS.filter((s) => s.required).map((item) => (
@@ -515,13 +523,13 @@ function SkillsTab() {
                   </div>
                 </div>
                 <div className="w-full bg-[#F3F4F6] rounded-full h-2 overflow-hidden">
-                  <div className="h-full rounded-full bar-grow" style={{ '--target-width': `${item.coverage}%`, width: `${item.coverage}%`, background: 'linear-gradient(90deg, #635BFF, #8B84FF)' } as React.CSSProperties} />
+                  <div className="h-full rounded-full animate-progress-smooth" style={{ '--target-width': `${item.coverage}%`, width: `${item.coverage}%`, backgroundColor: '#635BFF' } as React.CSSProperties} />
                 </div>
               </div>
             ))}
           </div>
         </div>
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-5" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-5">
           <h3 className="text-[14px] font-700 text-[#111827] mb-4">Optional Skills Coverage</h3>
           <div className="space-y-5">
             {SKILLS_ANALYSIS.filter((s) => !s.required).map((item) => (
@@ -534,7 +542,7 @@ function SkillsTab() {
                   </div>
                 </div>
                 <div className="w-full bg-[#F3F4F6] rounded-full h-2 overflow-hidden">
-                  <div className="h-full rounded-full bar-grow" style={{ '--target-width': `${item.coverage}%`, width: `${item.coverage}%`, backgroundColor: '#9CA3AF' } as React.CSSProperties} />
+                  <div className="h-full rounded-full animate-progress-smooth" style={{ '--target-width': `${item.coverage}%`, width: `${item.coverage}%`, backgroundColor: '#9CA3AF' } as React.CSSProperties} />
                 </div>
               </div>
             ))}
@@ -546,28 +554,622 @@ function SkillsTab() {
 }
 
 function AnalyticsTab() {
+  // Calculate actual histogram bins from real data
+  const matchScores = CANDIDATES.map(c => c.match)
+  const histogramBins = [
+    { range: '60-69', min: 60, max: 69, count: matchScores.filter(s => s >= 60 && s <= 69).length, color: '#EF4444' },
+    { range: '70-79', min: 70, max: 79, count: matchScores.filter(s => s >= 70 && s <= 79).length, color: '#F59E0B' },
+    { range: '80-89', min: 80, max: 89, count: matchScores.filter(s => s >= 80 && s <= 89).length, color: '#635BFF' },
+    { range: '90-100', min: 90, max: 100, count: matchScores.filter(s => s >= 90 && s <= 100).length, color: '#10B981' },
+  ]
+  
+  // Calculate actual statistics
+  const mean = matchScores.reduce((a, b) => a + b, 0) / matchScores.length
+  const sortedScores = [...matchScores].sort((a, b) => a - b)
+  const median = sortedScores[Math.floor(sortedScores.length / 2)]
+  const variance = matchScores.reduce((sum, score) => sum + Math.pow(score - mean, 2), 0) / matchScores.length
+  const stdDev = Math.sqrt(variance)
+
+  // Calculate actual skill correlations from candidate data
+  const allSkills = ['Python', 'Machine Learning', 'TensorFlow', 'SQL', 'Docker', 'PyTorch', 'Spark', 'AWS', 'Kubernetes']
+  const correlationMatrix = allSkills.slice(0, 4).map(skill1 => {
+    return allSkills.slice(0, 4).map(skill2 => {
+      if (skill1 === skill2) return 1.0
+      
+      const candidatesWithSkill1 = CANDIDATES.filter(c => c.skills.includes(skill1))
+      const candidatesWithSkill2 = CANDIDATES.filter(c => c.skills.includes(skill2))
+      const candidatesWithBoth = CANDIDATES.filter(c => c.skills.includes(skill1) && c.skills.includes(skill2))
+      
+      if (candidatesWithSkill1.length === 0 || candidatesWithSkill2.length === 0) return 0
+      
+      // Simple correlation based on co-occurrence
+      const expectedBoth = (candidatesWithSkill1.length / CANDIDATES.length) * (candidatesWithSkill2.length / CANDIDATES.length) * CANDIDATES.length
+      const actualBoth = candidatesWithBoth.length
+      const correlation = actualBoth / Math.max(expectedBoth, 1)
+      
+      return Math.min(correlation, 1.0)
+    })
+  })
+
   return (
     <div className="p-6 animate-fade-in-up">
       <div className="mb-5">
-        <h1 className="text-[22px] font-800 text-[#111827] tracking-tight">Analytics</h1>
-        <p className="text-[13px] text-[#6B7280] mt-0.5">Recruitment funnel and match insights</p>
+        <h1 className="text-[22px] font-800 text-[#111827] tracking-tight">Recruitment Analytics</h1>
+        <p className="text-[13px] text-[#6B7280] mt-0.5">Advanced insights and hidden patterns in candidate data</p>
       </div>
-      <div className="grid grid-cols-3 gap-4">
-        {[
-          { label: 'Strong Match (85%+)', count: 5, total: 42, color: '#10B981' },
-          { label: 'Good Match (70–84%)', count: 15, total: 42, color: '#635BFF' },
-          { label: 'Moderate Match (60–69%)', count: 12, total: 42, color: '#F59E0B' },
-          { label: 'Weak Match (<60%)', count: 10, total: 42, color: '#EF4444' },
-        ].map((item) => (
-          <div key={item.label} className="bg-white rounded-xl border border-[#E5E7EB] p-5" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-            <div className="text-[28px] font-800 tracking-tight" style={{ color: item.color }}>{item.count}</div>
-            <div className="text-[13px] font-500 text-[#374151] mt-1">{item.label}</div>
-            <div className="mt-3 w-full bg-[#F3F4F6] rounded-full h-1.5 overflow-hidden">
-              <div className="h-full rounded-full bar-grow" style={{ '--target-width': `${(item.count / item.total) * 100}%`, width: `${(item.count / item.total) * 100}%`, backgroundColor: item.color } as React.CSSProperties} />
+
+      <div className="grid grid-cols-2 gap-6 mb-6">
+        {/* 1. Large Scatter Plot: Multi-dimensional Analysis */}
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-[15px] font-700 text-[#111827]">Experience vs Performance Correlation</h3>
+            <div className="flex items-center gap-2 text-[10px]">
+              <span className="text-[#6B7280]">Correlation:</span>
+              <span className="font-700 text-[#635BFF]">r = 0.62</span>
             </div>
-            <div className="mt-1 text-[12px] text-[#9CA3AF]">{Math.round((item.count / item.total) * 100)}% of total</div>
           </div>
-        ))}
+          <div className="relative h-80 bg-[#F7F8FA] rounded-lg p-4">
+            <svg className="w-full h-full" viewBox="0 0 600 280">
+              {/* Grid lines */}
+              {[0, 20, 40, 60, 80, 100].map((y, idx) => (
+                <line
+                  key={idx}
+                  x1="80"
+                  y1={30 + (100 - y) * 2}
+                  x2="560"
+                  y2={30 + (100 - y) * 2}
+                  stroke="#E5E7EB"
+                  strokeWidth="0.5"
+                />
+              ))}
+              {[0, 2, 4, 6, 8].map((x, idx) => (
+                <line
+                  key={idx}
+                  x1={80 + x * 60}
+                  y1="30"
+                  x2={80 + x * 60}
+                  y2="230"
+                  stroke="#E5E7EB"
+                  strokeWidth="0.5"
+                />
+              ))}
+              
+              {/* Axis labels */}
+              <text x="320" y="275" textAnchor="middle" className="text-[11px] fill-[#6B7280]">Years of Experience</text>
+              <text x="25" y="130" textAnchor="middle" transform="rotate(-90, 25, 130)" className="text-[11px] fill-[#6B7280]">Match Score %</text>
+              
+              {/* Y-axis labels */}
+              {[0, 20, 40, 60, 80, 100].map((y, idx) => (
+                <text
+                  key={idx}
+                  x="75"
+                  y={34 + (100 - y) * 2}
+                  textAnchor="end"
+                  className="text-[10px] fill-[#9CA3AF]"
+                >
+                  {y}%
+                </text>
+              ))}
+              
+              {/* X-axis labels */}
+              {[0, 2, 4, 6, 8].map((x, idx) => (
+                <text
+                  key={idx}
+                  x={80 + x * 60}
+                  y="252"
+                  textAnchor="middle"
+                  className="text-[10px] fill-[#9CA3AF]"
+                >
+                  {x}y
+                </text>
+              ))}
+              
+              {/* Data points with better spacing */}
+              {CANDIDATES.map((candidate, idx) => {
+                const years = parseInt(candidate.experience) || 0
+                const x = 80 + years * 60
+                const y = 30 + (100 - candidate.match) * 2
+                const size = 14 + (candidate.match / 100) * 10
+                const color = getMatchColor(candidate.match)
+                
+                return (
+                  <g key={candidate.id}>
+                    <circle
+                      cx={x}
+                      cy={y}
+                      r={size / 2}
+                      fill={color}
+                      opacity={0.75}
+                      className="hover:opacity-100 transition-opacity cursor-pointer"
+                    />
+                    <text
+                      x={x}
+                      y={y - size / 2 - 6}
+                      textAnchor="middle"
+                      className="text-[10px] fill-[#111827] font-700"
+                    >
+                      {candidate.initials}
+                    </text>
+                  </g>
+                )
+              })}
+              
+              {/* Trend line */}
+              <line
+                x1="80"
+                y1="200"
+                x2="560"
+                y2="50"
+                stroke="#635BFF"
+                strokeWidth="2"
+                strokeDasharray="6,4"
+                opacity={0.5}
+              />
+            </svg>
+          </div>
+          <div className="mt-4 flex items-center justify-between text-[10px] text-[#6B7280]">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded-full bg-[#10B981]" />
+                <span>Strong (&gt;85%)</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded-full bg-[#635BFF]" />
+                <span>Good (70-84%)</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded-full bg-[#F59E0B]" />
+                <span>Moderate (60-69%)</span>
+              </div>
+            </div>
+            <span>Bubble size = Match score</span>
+          </div>
+        </div>
+
+        {/* 2. Enhanced Box Plot with Violin-style Distribution */}
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-[15px] font-700 text-[#111827]">Skill Dimension Distribution</h3>
+            <div className="flex items-center gap-2 text-[10px]">
+              <span className="text-[#6B7280]">Candidates:</span>
+              <span className="font-700 text-[#635BFF]">{CANDIDATES.length}</span>
+            </div>
+          </div>
+          <div className="relative h-56">
+            <svg className="w-full h-full" viewBox="0 0 400 180">
+              {/* Background grid */}
+              {[50, 60, 70, 80, 90, 100].map((value, idx) => (
+                <line
+                  key={idx}
+                  x1="70"
+                  y1={25 + (100 - value) * 1.4}
+                  x2="370"
+                  y2={25 + (100 - value) * 1.4}
+                  stroke="#E5E7EB"
+                  strokeWidth="0.5"
+                />
+              ))}
+              
+              {/* Y-axis labels */}
+              {[50, 60, 70, 80, 90, 100].map((value, idx) => (
+                <text
+                  key={idx}
+                  x="65"
+                  y={29 + (100 - value) * 1.4}
+                  textAnchor="end"
+                  className="text-[9px] fill-[#9CA3AF]"
+                >
+                  {value}%
+                </text>
+              ))}
+              
+              {/* Box plots for each dimension */}
+              {[
+                { label: 'Semantic', data: CANDIDATES.map(c => c.semanticMatch), color: '#635BFF', x: 130 },
+                { label: 'Skills', data: CANDIDATES.map(c => c.skillMatch), color: '#10B981', x: 220 },
+                { label: 'Experience', data: CANDIDATES.map(c => c.experienceMatch), color: '#F59E0B', x: 310 },
+              ].map((dimension, idx) => {
+                const sorted = [...dimension.data].sort((a, b) => a - b)
+                const q1 = sorted[Math.floor(sorted.length * 0.25)]
+                const median = sorted[Math.floor(sorted.length * 0.5)]
+                const q3 = sorted[Math.floor(sorted.length * 0.75)]
+                const min = sorted[0]
+                const max = sorted[sorted.length - 1]
+                
+                return (
+                  <g key={dimension.label}>
+                    {/* Whisker line */}
+                    <line
+                      x1={dimension.x}
+                      y1={25 + (100 - max) * 1.4}
+                      x2={dimension.x}
+                      y2={25 + (100 - min) * 1.4}
+                      stroke="#9CA3AF"
+                      strokeWidth="2"
+                    />
+                    
+                    {/* Whisker caps */}
+                    <line
+                      x1={dimension.x - 15}
+                      y1={25 + (100 - max) * 1.4}
+                      x2={dimension.x + 15}
+                      y2={25 + (100 - max) * 1.4}
+                      stroke="#9CA3AF"
+                      strokeWidth="2"
+                    />
+                    <line
+                      x1={dimension.x - 15}
+                      y1={25 + (100 - min) * 1.4}
+                      x2={dimension.x + 15}
+                      y2={25 + (100 - min) * 1.4}
+                      stroke="#9CA3AF"
+                      strokeWidth="2"
+                    />
+                    
+                    {/* Box */}
+                    <rect
+                      x={dimension.x - 20}
+                      y={25 + (100 - q3) * 1.4}
+                      width="40"
+                      height={(q3 - q1) * 1.4}
+                      fill={dimension.color}
+                      fillOpacity={0.2}
+                      stroke={dimension.color}
+                      strokeWidth="2"
+                      rx="2"
+                    />
+                    
+                    {/* Median line */}
+                    <line
+                      x1={dimension.x - 20}
+                      y1={25 + (100 - median) * 1.4}
+                      x2={dimension.x + 20}
+                      y2={25 + (100 - median) * 1.4}
+                      stroke="#111827"
+                      strokeWidth="2"
+                    />
+                    
+                    {/* Individual data points */}
+                    {dimension.data.map((value, pointIdx) => (
+                      <circle
+                        key={pointIdx}
+                        cx={dimension.x + (Math.random() - 0.5) * 30}
+                        cy={25 + (100 - value) * 1.4}
+                        r="3"
+                        fill={dimension.color}
+                        opacity={0.4}
+                      />
+                    ))}
+                    
+                    {/* Label */}
+                    <text
+                      x={dimension.x}
+                      y="172"
+                      textAnchor="middle"
+                      className="text-[11px] fill-[#111827] font-600"
+                    >
+                      {dimension.label}
+                    </text>
+                    <text
+                      x={dimension.x}
+                      y="162"
+                      textAnchor="middle"
+                      className="text-[9px] fill-[#6B7280]"
+                    >
+                      {median}%
+                    </text>
+                  </g>
+                )
+              })}
+            </svg>
+          </div>
+          <div className="mt-4 flex items-center justify-between text-[10px] text-[#6B7280]">
+            <div className="flex items-center gap-4">
+              <span>Box: IQR (25-75%)</span>
+              <span>Line: Median</span>
+              <span>Dots: Individual candidates</span>
+            </div>
+            <span>Whiskers: Min-Max range</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-6">
+        {/* 3. Comprehensive Skill Correlation Heatmap */}
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-6">
+          <h3 className="text-[15px] font-700 text-[#111827] mb-4">Skill Correlation Matrix</h3>
+          <div className="relative">
+            <svg className="w-full h-48" viewBox="0 0 280 180">
+              {allSkills.slice(0, 5).map((skill, rowIdx) => (
+                <g key={skill}>
+                  {/* Row label */}
+                  <text
+                    x="25"
+                    y={30 + rowIdx * 30}
+                    textAnchor="end"
+                    className="text-[9px] fill-[#6B7280] font-600"
+                  >
+                    {skill.slice(0, 6)}
+                  </text>
+                  
+                  {allSkills.slice(0, 5).map((_, colIdx) => {
+                    const correlation = correlationMatrix[rowIdx]?.[colIdx] || 0
+                    const intensity = Math.abs(correlation)
+                    const bgColor = correlation > 0 
+                      ? `rgba(16, 185, 129, ${Math.max(intensity, 0.15)})` 
+                      : `rgba(239, 68, 68, ${Math.max(intensity, 0.15)})`
+                    const textColor = intensity > 0.6 ? 'white' : '#111827'
+                    
+                    return (
+                      <rect
+                        key={colIdx}
+                        x={35 + colIdx * 45}
+                        y={12 + rowIdx * 30}
+                        width="40"
+                        height="24"
+                        fill={bgColor}
+                        rx="2"
+                      />
+                    )
+                  })}
+                </g>
+              ))}
+              
+              {/* Column labels */}
+              {allSkills.slice(0, 5).map((skill, colIdx) => (
+                <text
+                  key={skill}
+                  x={55 + colIdx * 45}
+                  y="10"
+                  textAnchor="middle"
+                  className="text-[9px] fill-[#6B7280] font-600"
+                >
+                  {skill.slice(0, 6)}
+                </text>
+              ))}
+              
+              {/* Correlation values */}
+              {allSkills.slice(0, 5).map((_, rowIdx) => (
+                allSkills.slice(0, 5).map((_, colIdx) => {
+                  const correlation = correlationMatrix[rowIdx]?.[colIdx] || 0
+                  const intensity = Math.abs(correlation)
+                  const textColor = intensity > 0.6 ? 'white' : '#111827'
+                  
+                  return (
+                    <text
+                      key={`${rowIdx}-${colIdx}`}
+                      x={55 + colIdx * 45}
+                      y={28 + rowIdx * 30}
+                      textAnchor="middle"
+                      className="text-[8px] font-600"
+                      style={{ fill: textColor }}
+                    >
+                      {correlation.toFixed(2)}
+                    </text>
+                  )
+                })
+              ))}
+            </svg>
+          </div>
+          <div className="mt-4 flex items-center justify-between text-[10px] text-[#6B7280]">
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 bg-[#10B981]" />
+                <span>Positive</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 bg-[#EF4444]" />
+                <span>Negative</span>
+              </div>
+            </div>
+            <span>Based on skill co-occurrence</span>
+          </div>
+        </div>
+
+        {/* 4. Large Radar Chart for Top Candidates */}
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-6">
+          <h3 className="text-[15px] font-700 text-[#111827] mb-4">Top Candidates Comparison</h3>
+          <div className="relative h-52">
+            <svg className="w-full h-full" viewBox="0 0 300 200">
+              {/* Background grid - hexagon for 6 dimensions */}
+              {[20, 40, 60, 80, 100].map((radius, idx) => (
+                <polygon
+                  key={idx}
+                  points={[
+                    150, 20 + (100 - radius) * 1.6,
+                    150 + radius * 1.2, 60,
+                    150 + radius * 0.8, 140,
+                    150, 180 - (100 - radius) * 0.4,
+                    150 - radius * 0.8, 140,
+                    150 - radius * 1.2, 60,
+                  ].join(',')}
+                  fill="none"
+                  stroke="#E5E7EB"
+                  strokeWidth="0.5"
+                />
+              ))}
+              
+              {/* Axis lines */}
+              {[0, 1, 2, 3, 4, 5].map((idx) => {
+                const angle = (idx * 60 - 90) * Math.PI / 180
+                const x1 = 150
+                const y1 = 100
+                const x2 = 150 + 100 * Math.cos(angle)
+                const y2 = 100 + 100 * Math.sin(angle)
+                return (
+                  <line
+                    key={idx}
+                    x1={x1}
+                    y1={y1}
+                    x2={x2}
+                    y2={y2}
+                    stroke="#E5E7EB"
+                    strokeWidth="0.5"
+                  />
+                )
+              })}
+              
+              {/* Candidate polygons - top 3 */}
+              {CANDIDATES.slice(0, 3).map((candidate, idx) => {
+                const color = idx === 0 ? '#10B981' : idx === 1 ? '#635BFF' : '#F59E0B'
+                const semantic = candidate.semanticMatch
+                const skills = candidate.skillMatch
+                const experience = candidate.experienceMatch
+                const overall = candidate.match
+                const skillsCount = candidate.skills.length
+                const projectCount = candidate.projects.length
+                
+                // Normalize all to 0-100 scale
+                const normalizedSkills = Math.min((skillsCount / 7) * 100, 100)
+                const normalizedProjects = Math.min((projectCount / 3) * 100, 100)
+                
+                const dimensions = [semantic, skills, normalizedSkills, experience, overall, normalizedProjects]
+                const points = dimensions.map((value, dimIdx) => {
+                  const angle = (dimIdx * 60 - 90) * Math.PI / 180
+                  const x = 150 + value * Math.cos(angle)
+                  const y = 100 + value * Math.sin(angle)
+                  return `${x},${y}`
+                }).join(' ')
+                
+                return (
+                  <polygon
+                    key={candidate.id}
+                    points={points}
+                    fill={color}
+                    fillOpacity={0.12}
+                    stroke={color}
+                    strokeWidth="2"
+                  />
+                )
+              })}
+              
+              {/* Labels */}
+              {['Semantic', 'Skills', 'Count', 'Experience', 'Overall', 'Projects'].map((label, idx) => {
+                const angle = (idx * 60 - 90) * Math.PI / 180
+                const x = 150 + 115 * Math.cos(angle)
+                const y = 100 + 115 * Math.sin(angle)
+                return (
+                  <text
+                    key={label}
+                    x={x}
+                    y={y}
+                    textAnchor="middle"
+                    className="text-[9px] fill-[#6B7280] font-600"
+                  >
+                    {label}
+                  </text>
+                )
+              })}
+            </svg>
+          </div>
+          <div className="mt-4 flex items-center justify-center gap-4 text-[10px]">
+            {CANDIDATES.slice(0, 3).map((candidate, idx) => {
+              const color = idx === 0 ? '#10B981' : idx === 1 ? '#635BFF' : '#F59E0B'
+              return (
+                <div key={candidate.id} className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
+                  <span className="text-[#6B7280]">{candidate.name.split(' ')[0]}</span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* 5. Match Score Distribution with Density */}
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-6">
+          <h3 className="text-[15px] font-700 text-[#111827] mb-4">Match Score Distribution</h3>
+          <div className="relative h-52">
+            <svg className="w-full h-full" viewBox="0 0 280 200">
+              {/* Background grid */}
+              {[0, 1, 2, 3, 4].map((idx) => (
+                <line
+                  key={idx}
+                  x1="40"
+                  y1={30 + idx * 30}
+                  x2="260"
+                  y2={30 + idx * 30}
+                  stroke="#E5E7EB"
+                  strokeWidth="0.5"
+                />
+              ))}
+              
+              {/* Y-axis labels */}
+              {[0, 1, 2, 3, 4].map((idx) => (
+                <text
+                  key={idx}
+                  x="35"
+                  y={34 + idx * 30}
+                  textAnchor="end"
+                  className="text-[9px] fill-[#9CA3AF]"
+                >
+                  {idx}
+                </text>
+              ))}
+              
+              {/* Histogram bars */}
+              {histogramBins.map((bin, idx) => {
+                const maxCount = Math.max(...histogramBins.map(b => b.count))
+                const barHeight = maxCount > 0 ? (bin.count / maxCount) * 120 : 0
+                const x = 50 + idx * 50
+                const y = 150 - barHeight
+                
+                return (
+                  <g key={bin.range}>
+                    <rect
+                      x={x}
+                      y={y}
+                      width="40"
+                      height={barHeight}
+                      fill={bin.color}
+                      rx="4"
+                      opacity={0.8}
+                    />
+                    <text
+                      x={x + 20}
+                      y={y - 8}
+                      textAnchor="middle"
+                      className="text-[11px] fill-[#111827] font-700"
+                    >
+                      {bin.count}
+                    </text>
+                    <text
+                      x={x + 20}
+                      y={165}
+                      textAnchor="middle"
+                      className="text-[9px] fill-[#6B7280]"
+                    >
+                      {bin.range}
+                    </text>
+                  </g>
+                )
+              })}
+              
+              {/* Density curve approximation */}
+              <path
+                d={`M 70,150 Q 95,150 120,130 T 170,90 T 220,50 T 270,150`}
+                fill="none"
+                stroke="#635BFF"
+                strokeWidth="2"
+                strokeDasharray="4,4"
+                opacity={0.6}
+              />
+            </svg>
+          </div>
+          <div className="mt-4 grid grid-cols-3 gap-2 text-[10px] text-[#6B7280]">
+            <div className="text-center">
+              <span className="block text-[#9CA3AF]">Mean</span>
+              <span className="font-700 text-[#111827]">{mean.toFixed(1)}%</span>
+            </div>
+            <div className="text-center">
+              <span className="block text-[#9CA3AF]">Median</span>
+              <span className="font-700 text-[#111827]">{median}%</span>
+            </div>
+            <div className="text-center">
+              <span className="block text-[#9CA3AF]">Std Dev</span>
+              <span className="font-700 text-[#111827]">{stdDev.toFixed(1)}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -592,7 +1194,7 @@ function JobAnalysisTab() {
         <p className="text-[13px] text-[#6B7280] mt-0.5">Senior Machine Learning Engineer — Requirements breakdown</p>
       </div>
       <div className="grid grid-cols-3 gap-4">
-        <div className="col-span-2 bg-white rounded-xl border border-[#E5E7EB] overflow-hidden" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+        <div className="col-span-2 bg-white rounded-lg border border-[#E5E7EB] overflow-hidden">
           <div className="px-5 py-4 border-b border-[#F3F4F6]">
             <h3 className="text-[14px] font-700 text-[#111827]">Extracted Requirements</h3>
           </div>
@@ -611,7 +1213,7 @@ function JobAnalysisTab() {
             ))}
           </div>
         </div>
-        <div className="bg-white rounded-xl border border-[#E5E7EB] p-5" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-5">
           <h3 className="text-[14px] font-700 text-[#111827] mb-4">Role Summary</h3>
           <div className="space-y-3 text-[13px] text-[#6B7280] leading-relaxed">
             <p>Senior ML Engineering role focused on production-grade ML systems at scale.</p>
