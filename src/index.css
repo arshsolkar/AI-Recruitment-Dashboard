@@ -1,0 +1,194 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --color-accent: #635BFF;
+  --color-accent-muted: #EEF0FF;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  --color-surface: #F7F8FA;
+  --color-card: #FFFFFF;
+  --color-ink: #111827;
+  --color-ink-muted: #6B7280;
+  --color-ink-faint: #9CA3AF;
+  --color-rule: #E5E7EB;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #D1D5DB transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #E5E7EB;
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #D1D5DB;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #F7F8FA;
+  color: #111827;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+@keyframes pulse-ring-slow {
+  0% { transform: scale(1); opacity: 0.3; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+@keyframes scan-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes scan-rotate-reverse {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+@keyframes orbit-a {
+  from { transform: rotate(0deg) translateX(72px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(72px) rotate(-360deg); }
+}
+
+@keyframes orbit-b {
+  from { transform: rotate(120deg) translateX(108px) rotate(-120deg); }
+  to { transform: rotate(480deg) translateX(108px) rotate(-480deg); }
+}
+
+@keyframes orbit-c {
+  from { transform: rotate(240deg) translateX(144px) rotate(-240deg); }
+  to { transform: rotate(600deg) translateX(144px) rotate(-600deg); }
+}
+
+@keyframes orbit-d {
+  from { transform: rotate(60deg) translateX(90px) rotate(-60deg); }
+  to { transform: rotate(420deg) translateX(90px) rotate(-420deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-scale {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bar-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes progress-fill {
+  from { width: 0%; }
+  to { width: var(--target-width); }
+}
+
+@keyframes ripple {
+  0% { transform: scale(0); opacity: 0.6; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+@keyframes blink-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+@keyframes step-check {
+  from { transform: scale(0.6) rotate(-10deg); opacity: 0; }
+  to { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.4s ease both;
+}
+
+.animate-fade-in-scale {
+  animation: fade-in-scale 0.35s ease both;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.3s ease both;
+}
+
+.animate-orbit-a {
+  animation: orbit-a 6s linear infinite;
+}
+
+.animate-orbit-b {
+  animation: orbit-b 9s linear infinite;
+}
+
+.animate-orbit-c {
+  animation: orbit-c 12s linear infinite;
+}
+
+.animate-orbit-d {
+  animation: orbit-d 7.5s linear infinite;
+}
+
+.animate-scan-rotate {
+  animation: scan-rotate 8s linear infinite;
+}
+
+.animate-scan-rotate-reverse {
+  animation: scan-rotate-reverse 12s linear infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-blink {
+  animation: blink-dot 1.4s ease-in-out infinite;
+}
+
+.bar-grow {
+  transform-origin: left center;
+  animation: bar-grow 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
