@@ -3,9 +3,10 @@ import { useState } from 'react'
 interface TopBarProps {
   onNewAnalysis: () => void
   onExportReport?: () => void
+  currentAnalysis?: any
 }
 
-export default function TopBar({ onNewAnalysis, onExportReport }: TopBarProps) {
+export default function TopBar({ onNewAnalysis, onExportReport, currentAnalysis }: TopBarProps) {
   const [showExportDialog, setShowExportDialog] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
   const [exportSuccess, setExportSuccess] = useState(false)
@@ -29,7 +30,7 @@ export default function TopBar({ onNewAnalysis, onExportReport }: TopBarProps) {
         <div>
           <span className="text-[13px] font-500 text-[#6B7280]">
             Analysis ·{' '}
-            <span className="text-[#111827] font-600">Senior Machine Learning Engineer</span>
+            <span className="text-[#111827] font-600">{currentAnalysis?.job_title || 'Job Position'}</span>
           </span>
         </div>
 

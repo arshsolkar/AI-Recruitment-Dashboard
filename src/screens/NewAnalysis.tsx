@@ -4,10 +4,11 @@ interface UploadedFile {
   name: string
   size: number
   id: string
+  file: File
 }
 
 interface NewAnalysisProps {
-  onAnalyze: () => void
+  onAnalyze: (jobDescription: string, jobTitle: string | undefined, files: File[]) => void
 }
 
 function formatBytes(bytes: number): string {
@@ -17,50 +18,24 @@ function formatBytes(bytes: number): string {
 }
 
 export default function NewAnalysis({ onAnalyze }: NewAnalysisProps) {
-  const [jdMode, setJdMode] = useState<'paste' | 'upload'>('paste')
-  const [jdText, setJdText] = useState(
-    `Senior Machine Learning Engineer
-
-We are looking for an experienced Machine Learning Engineer to join our AI Platform team. In this role, you will design, build, and deploy production ML systems at scale.
-
-Key Responsibilities:
-• Develop and deploy machine learning models for production use cases
-• Build scalable ML pipelines using Python, TensorFlow, and Spark
-• Collaborate with data scientists and engineers on model deployment
-• Optimize model performance and infrastructure efficiency
-
-Requirements:
-• 4+ years of experience in ML engineering
-• Proficiency in Python, TensorFlow/PyTorch, and SQL
-• Experience with Docker, Kubernetes, and cloud platforms (AWS/GCP)
-• Strong understanding of ML algorithms and statistical methods`
-  )
-  const [files, setFiles] = useState<UploadedFile[]>([
-    { name: 'rahul_sharma_resume.pdf', size: 284710, id: '1' },
-    { name: 'priya_patel_cv.pdf', size: 312440, id: '2' },
-    { name: 'aman_kumar_resume.pdf', size: 198320, id: '3' },
-  ])
+  const [jdText, setJdText] = useState('')
+  const [files, setFiles] = useState<UploadedFile[]>([])
   const [isDragging, setIsDragging] = useState(false)
-  const [jdUploaded, setJdUploaded] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const jdFileInputRef = useRef<HTMLInputElement>(null)
 
-  const addFakeFiles = useCallback(() => {
-    const names = [
-      'sneha_joshi_resume.pdf',
-      'rohan_mehta_cv.pdf',
-      'ananya_singh_resume.pdf',
-      'vikram_nair_resume.pdf',
-      'divya_reddy_cv.pdf',
-    ]
-    const newFiles = names
-      .filter((n) => !files.some((f) => f.name === n))
-      .slice(0, 2)
-      .map((name) => ({
-        name,
-        size: Math.floor(Math.random() * 300000) + 150000,
+  const addFiles = useCallback((newFileList: FileList | null) => {
+    if (!newFileList) return
+    
+    const newFiles = Array.from(newFileList)
+      .filter(file => file.name.toLowerCase().endsWith('.pdf'))
+      .filter(file => !files.some((f) => f.name === file.name))
+      .map(file => ({
+        name: file.name,
+        size: file.size,
         id: Math.random().toString(36).slice(2),
+        file,
       }))
+    
     if (newFiles.length) setFiles((prev) => [...prev, ...newFiles])
   }, [files])
 
@@ -82,18 +57,26 @@ Requirements:
     e.preventDefault()
     e.stopPropagation()
     setIsDragging(false)
-    addFakeFiles()
-  }, [addFakeFiles])
+    addFiles(e.dataTransfer.files)
+  }, [addFiles])
 
-  const handleFileInput = useCallback(() => {
-    addFakeFiles()
-  }, [addFakeFiles])
+  const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    addFiles(e.target.files)
+  }, [addFiles])
 
   const removeFile = (id: string) => {
     setFiles((prev) => prev.filter((f) => f.id !== id))
   }
 
-  const canAnalyze = (jdText.trim().length > 20 || jdUploaded) && files.length > 0
+  const canAnalyze = jdText.trim().length > 20 && files.length > 0
+
+  const handleAnalyze = () => {
+    if (!canAnalyze) return
+    
+    const jobTitle = jdText.split('\n')[0].trim() || undefined
+    const resumeFiles = files.map(f => f.file)
+    onAnalyze(jdText, jobTitle, resumeFiles)
+  }
 
   return (
     <div className="min-h-screen bg-[#F7F8FA] flex flex-col">
@@ -144,92 +127,25 @@ Requirements:
         <div className="w-full grid grid-cols-2 gap-5 mb-6" style={{ animationDelay: '0.1s' }}>
           {/* Job Description Card */}
           <div className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)' }}>
-            <div className="px-5 py-4 border-b border-[#E5E7EB] flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-md bg-[#EEF0FF] flex items-center justify-center">
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                    <rect x="1" y="1" width="10" height="10" rx="1.5" stroke="#635BFF" strokeWidth="1.2" fill="none" />
-                    <path d="M3 4h6M3 6h6M3 8h4" stroke="#635BFF" strokeWidth="1.2" strokeLinecap="round" />
-                  </svg>
-                </div>
-                <span className="text-[13px] font-700 text-[#111827]">Job Description</span>
+            <div className="px-5 py-4 border-b border-[#E5E7EB] flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md bg-[#EEF0FF] flex items-center justify-center">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <rect x="1" y="1" width="10" height="10" rx="1.5" stroke="#635BFF" strokeWidth="1.2" fill="none" />
+                  <path d="M3 4h6M3 6h6M3 8h4" stroke="#635BFF" strokeWidth="1.2" strokeLinecap="round" />
+                </svg>
               </div>
-              {/* Mode toggle */}
-              <div className="flex items-center bg-[#F7F8FA] rounded-lg p-0.5 gap-0.5">
-                <button
-                  onClick={() => setJdMode('paste')}
-                  className={`px-3 py-1 rounded-md text-[12px] font-500 transition-all duration-150 ${
-                    jdMode === 'paste' ? 'bg-white text-[#111827] shadow-sm' : 'text-[#6B7280] hover:text-[#111827]'
-                  }`}
-                >
-                  Paste Text
-                </button>
-                <button
-                  onClick={() => setJdMode('upload')}
-                  className={`px-3 py-1 rounded-md text-[12px] font-500 transition-all duration-150 ${
-                    jdMode === 'upload' ? 'bg-white text-[#111827] shadow-sm' : 'text-[#6B7280] hover:text-[#111827]'
-                  }`}
-                >
-                  Upload PDF
-                </button>
-              </div>
+              <span className="text-[13px] font-700 text-[#111827]">Job Description</span>
             </div>
 
             <div className="p-5">
-              {jdMode === 'paste' ? (
-                <textarea
-                  value={jdText}
-                  onChange={(e) => setJdText(e.target.value)}
-                  placeholder="Paste your job description here..."
-                  className="w-full h-64 text-[13px] text-[#111827] placeholder-[#9CA3AF] bg-[#F7F8FA] border border-[#E5E7EB] rounded-lg px-3.5 py-3 resize-none focus:outline-none focus:border-[#635BFF] focus:ring-2 focus:ring-[#EEF0FF] transition-all duration-150 leading-relaxed font-400"
-                />
-              ) : (
-                <div
-                  onClick={() => jdFileInputRef.current?.click()}
-                  className={`h-64 flex flex-col items-center justify-center border-2 border-dashed rounded-lg cursor-pointer transition-all duration-200 ${
-                    jdUploaded
-                      ? 'border-[#10B981] bg-[#F0FDF4]'
-                      : 'border-[#D1D5DB] hover:border-[#635BFF] hover:bg-[#F7F8FF]'
-                  }`}
-                >
-                  {jdUploaded ? (
-                    <>
-                      <div className="w-10 h-10 rounded-full bg-[#10B981] flex items-center justify-center mb-3">
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                          <path d="M4 9l4 4 6-7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      </div>
-                      <span className="text-[13px] font-600 text-[#10B981]">job_description.pdf uploaded</span>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setJdUploaded(false) }}
-                        className="mt-2 text-[12px] text-[#6B7280] hover:text-[#EF4444] transition-colors"
-                      >
-                        Remove
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <div className="w-10 h-10 rounded-full bg-[#F3F4F6] flex items-center justify-center mb-3">
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                          <path d="M9 2v10M5 6l4-4 4 4" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                          <path d="M3 14h12" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" />
-                        </svg>
-                      </div>
-                      <span className="text-[13px] font-500 text-[#374151]">Drop PDF here or click to upload</span>
-                      <span className="text-[12px] text-[#9CA3AF] mt-1">PDF files only</span>
-                    </>
-                  )}
-                  <input
-                    ref={jdFileInputRef}
-                    type="file"
-                    accept=".pdf"
-                    className="hidden"
-                    onChange={() => setJdUploaded(true)}
-                  />
-                </div>
-              )}
+              <textarea
+                value={jdText}
+                onChange={(e) => setJdText(e.target.value)}
+                placeholder="Paste your job description here... Include role title, responsibilities, requirements, and desired skills."
+                className="w-full h-64 text-[13px] text-[#111827] placeholder-[#9CA3AF] bg-[#F7F8FA] border border-[#E5E7EB] rounded-lg px-3.5 py-3 resize-none focus:outline-none focus:border-[#635BFF] focus:ring-2 focus:ring-[#EEF0FF] transition-all duration-150 leading-relaxed font-400"
+              />
 
-              {jdMode === 'paste' && jdText.length > 0 && (
+              {jdText.length > 0 && (
                 <div className="mt-2 flex items-center justify-between">
                   <span className="text-[11px] text-[#9CA3AF]">{jdText.length} characters</span>
                   <button
@@ -341,7 +257,7 @@ Requirements:
         {/* CTA */}
         <div className="flex flex-col items-center gap-3">
           <button
-            onClick={onAnalyze}
+            onClick={handleAnalyze}
             disabled={!canAnalyze}
             className={`flex items-center gap-2.5 px-8 py-3.5 rounded-xl text-[15px] font-700 text-white transition-all duration-200 ${
               canAnalyze

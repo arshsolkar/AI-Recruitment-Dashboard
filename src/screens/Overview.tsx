@@ -1,9 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import type { SidebarTab } from '../components/Sidebar'
+import type { Candidate } from '../data/candidates'
 import {
-  CANDIDATES,
-  SKILLS_ANALYSIS,
-  MATCH_DISTRIBUTION,
   getRecommendationColor,
   getMatchColor,
   getInitialsColor,
@@ -11,7 +9,9 @@ import {
 
 interface OverviewProps {
   activeTab: SidebarTab
-  onSelectCandidate: (id: number) => void
+  candidates: Candidate[]
+  onSelectCandidate: (id: string) => void
+  currentAnalysis?: any
 }
 
 function useCountUp(target: number, duration = 800) {
@@ -70,8 +70,8 @@ function KpiCard({
   )
 }
 
-function BarChart() {
-  const maxCount = Math.max(...MATCH_DISTRIBUTION.map((d) => d.count))
+function BarChart({ distribution }: { distribution: any[] }) {
+  const maxCount = Math.max(...distribution.map((d) => d.count))
   const [mounted, setMounted] = useState(false)
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 200)
@@ -80,7 +80,7 @@ function BarChart() {
 
   return (
     <div className="space-y-3">
-      {MATCH_DISTRIBUTION.map((item) => {
+      {distribution.map((item) => {
         const pct = maxCount > 0 ? (item.count / maxCount) * 100 : 0
         return (
           <div key={item.range} className="flex items-center gap-3">
@@ -140,23 +140,67 @@ function SkillPill({ skill, present }: { skill: string; present: boolean }) {
   )
 }
 
-export default function Overview({ activeTab, onSelectCandidate }: OverviewProps) {
-  const topCandidates = CANDIDATES.slice(0, 5)
+export default function Overview({ activeTab, candidates, onSelectCandidate, currentAnalysis }: OverviewProps) {
+  const topCandidates = candidates.slice(0, 5)
+  
+  // Calculate derived data from real candidates
+  const strongMatches = candidates.filter(c => c.recommendation === 'Strong Match').length
+  const avgMatch = candidates.length > 0 
+    ? Math.round(candidates.reduce((sum, c) => sum + c.match, 0) / candidates.length)
+    : 0
+  
+  // Calculate match distribution from real candidates
+  const distribution = [
+    { range: '90–100%', count: candidates.filter(c => c.match >= 90).length, color: '#10B981' },
+    { range: '80–89%', count: candidates.filter(c => c.match >= 80 && c.match < 90).length, color: '#10B981' },
+    { range: '70–79%', count: candidates.filter(c => c.match >= 70 && c.match < 80).length, color: '#F59E0B' },
+    { range: '60–69%', count: candidates.filter(c => c.match >= 60 && c.match < 70).length, color: '#F59E0B' },
+    { range: 'Below 60%', count: candidates.filter(c => c.match < 60).length, color: '#EF4444' },
+  ]
+  
+  // Calculate skill coverage from real candidates
+  const allSkills = new Set<string>()
+  candidates.forEach(c => {
+    c.skills.forEach(s => allSkills.add(s))
+  })
+  
+  const skillCoverage = Array.from(allSkills).map(skill => {
+    const coverage = candidates.filter(c => c.skills.includes(skill)).length
+    const missing = candidates.length - coverage
+    return {
+      skill,
+      required: true,
+      coverage: Math.round((coverage / candidates.length) * 100),
+      missing,
+    }
+  }).sort((a, b) => b.coverage - a.coverage).slice(0, 9)
 
   if (activeTab === 'candidates') {
-    return <CandidatesTab onSelectCandidate={onSelectCandidate} />
+    return <CandidatesTab onSelectCandidate={onSelectCandidate} candidates={candidates} />
   }
 
   if (activeTab === 'skills') {
-    return <SkillsTab />
+    return <SkillsTab candidates={candidates} />
   }
 
   if (activeTab === 'analytics') {
-    return <AnalyticsTab />
+    return <AnalyticsTab candidates={candidates} />
   }
 
   if (activeTab === 'job-analysis') {
-    return <JobAnalysisTab />
+    return <JobAnalysisTab currentAnalysis={currentAnalysis} />
+  }
+
+  // Fallback if something goes wrong
+  if (candidates.length === 0) {
+    return (
+      <div className="p-6 flex items-center justify-center h-full">
+        <div className="text-center">
+          <div className="text-[16px] font-600 text-[#6B7280] mb-2">No candidates found</div>
+          <div className="text-[13px] text-[#9CA3AF]">Try starting a new analysis</div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -166,7 +210,7 @@ export default function Overview({ activeTab, onSelectCandidate }: OverviewProps
         <h1 className="text-[22px] font-800 text-[#111827] tracking-tight">Recruitment Overview</h1>
         <p className="text-[13px] text-[#6B7280] mt-0.5">
           AI analysis results for{' '}
-          <span className="font-500 text-[#374151]">Senior Machine Learning Engineer</span>
+          <span className="font-500 text-[#374151]">{currentAnalysis?.job_title || 'Job Position'}</span>
         </p>
       </div>
 
@@ -174,7 +218,7 @@ export default function Overview({ activeTab, onSelectCandidate }: OverviewProps
       <div className="grid grid-cols-4 gap-4">
         <KpiCard
           label="Total Candidates"
-          value={42}
+          value={candidates.length}
           delay={0}
           icon={
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -187,7 +231,7 @@ export default function Overview({ activeTab, onSelectCandidate }: OverviewProps
         />
         <KpiCard
           label="Strong Matches"
-          value={12}
+          value={strongMatches}
           delay={0.06}
           icon={
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -197,7 +241,7 @@ export default function Overview({ activeTab, onSelectCandidate }: OverviewProps
         />
         <KpiCard
           label="Average Match"
-          value={84}
+          value={avgMatch}
           suffix="%"
           delay={0.12}
           icon={
@@ -209,7 +253,7 @@ export default function Overview({ activeTab, onSelectCandidate }: OverviewProps
         />
         <KpiCard
           label="Critical Skill Gaps"
-          value={3}
+          value={skillCoverage.reduce((sum, s) => sum + s.missing, 0)}
           delay={0.18}
           icon={
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -293,10 +337,10 @@ export default function Overview({ activeTab, onSelectCandidate }: OverviewProps
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-[14px] font-700 text-[#111827]">Match Distribution</h3>
-              <p className="text-[12px] text-[#9CA3AF] mt-0.5">42 candidates analyzed</p>
+              <p className="text-[12px] text-[#9CA3AF] mt-0.5">{candidates.length} candidates analyzed</p>
             </div>
           </div>
-          <BarChart />
+          <BarChart distribution={distribution} />
         </div>
       </div>
 
@@ -344,7 +388,7 @@ export default function Overview({ activeTab, onSelectCandidate }: OverviewProps
 
           {/* Rows */}
           <div className="divide-y divide-[#F3F4F6]">
-            {CANDIDATES.map((c, idx) => (
+            {candidates.map((c, idx) => (
               <button
                 key={c.id}
                 onClick={() => onSelectCandidate(c.id)}
@@ -407,7 +451,7 @@ export default function Overview({ activeTab, onSelectCandidate }: OverviewProps
             <p className="text-[12px] text-[#9CA3AF] mt-0.5">Required skills across candidates</p>
           </div>
           <div className="px-5 py-4 space-y-4">
-            {SKILLS_ANALYSIS.map((item) => (
+            {skillCoverage.map((item) => (
               <div key={item.skill}>
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-1.5">
@@ -441,12 +485,12 @@ export default function Overview({ activeTab, onSelectCandidate }: OverviewProps
   )
 }
 
-function CandidatesTab({ onSelectCandidate }: { onSelectCandidate: (id: number) => void }) {
+function CandidatesTab({ onSelectCandidate, candidates }: { onSelectCandidate: (id: string) => void; candidates: Candidate[] }) {
   return (
     <div className="p-6 animate-fade-in-up">
       <div className="mb-5">
         <h1 className="text-[22px] font-800 text-[#111827] tracking-tight">All Candidates</h1>
-        <p className="text-[13px] text-[#6B7280] mt-0.5">8 candidates · Ranked by AI match score</p>
+        <p className="text-[13px] text-[#6B7280] mt-0.5">{candidates.length} candidates · Ranked by AI match score</p>
       </div>
       <div
         className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden"
@@ -461,7 +505,7 @@ function CandidatesTab({ onSelectCandidate }: { onSelectCandidate: (id: number) 
           <span>Recommendation</span>
         </div>
         <div className="divide-y divide-[#F3F4F6]">
-          {CANDIDATES.map((c, idx) => (
+          {candidates.map((c, idx) => (
             <button
               key={c.id}
               onClick={() => onSelectCandidate(c.id)}
@@ -502,7 +546,27 @@ function CandidatesTab({ onSelectCandidate }: { onSelectCandidate: (id: number) 
   )
 }
 
-function SkillsTab() {
+function SkillsTab({ candidates }: { candidates: Candidate[] }) {
+  // Calculate skill coverage from real candidates
+  const allSkills = new Set<string>()
+  candidates.forEach(c => {
+    c.skills.forEach(s => allSkills.add(s))
+  })
+  
+  const skillCoverage = Array.from(allSkills).map(skill => {
+    const coverage = candidates.filter(c => c.skills.includes(skill)).length
+    const missing = candidates.length - coverage
+    return {
+      skill,
+      required: true,
+      coverage: Math.round((coverage / candidates.length) * 100),
+      missing,
+    }
+  }).sort((a, b) => b.coverage - a.coverage)
+  
+  const requiredSkills = skillCoverage.slice(0, 6)
+  const optionalSkills = skillCoverage.slice(6)
+
   return (
     <div className="p-6 animate-fade-in-up">
       <div className="mb-5">
@@ -511,9 +575,9 @@ function SkillsTab() {
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-white rounded-lg border border-[#E5E7EB] p-5">
-          <h3 className="text-[14px] font-700 text-[#111827] mb-4">Required Skills Coverage</h3>
+          <h3 className="text-[14px] font-700 text-[#111827] mb-4">Top Skills Coverage</h3>
           <div className="space-y-5">
-            {SKILLS_ANALYSIS.filter((s) => s.required).map((item) => (
+            {requiredSkills.map((item) => (
               <div key={item.skill}>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[13px] font-600 text-[#374151]">{item.skill}</span>
@@ -530,9 +594,9 @@ function SkillsTab() {
           </div>
         </div>
         <div className="bg-white rounded-lg border border-[#E5E7EB] p-5">
-          <h3 className="text-[14px] font-700 text-[#111827] mb-4">Optional Skills Coverage</h3>
+          <h3 className="text-[14px] font-700 text-[#111827] mb-4">Other Skills Coverage</h3>
           <div className="space-y-5">
-            {SKILLS_ANALYSIS.filter((s) => !s.required).map((item) => (
+            {optionalSkills.map((item) => (
               <div key={item.skill}>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[13px] font-600 text-[#374151]">{item.skill}</span>
@@ -553,9 +617,9 @@ function SkillsTab() {
   )
 }
 
-function AnalyticsTab() {
+function AnalyticsTab({ candidates }: { candidates: Candidate[] }) {
   // Calculate actual histogram bins from real data
-  const matchScores = CANDIDATES.map(c => c.match)
+  const matchScores = candidates.map(c => c.match)
   const histogramBins = [
     { range: '60-69', min: 60, max: 69, count: matchScores.filter(s => s >= 60 && s <= 69).length, color: '#EF4444' },
     { range: '70-79', min: 70, max: 79, count: matchScores.filter(s => s >= 70 && s <= 79).length, color: '#F59E0B' },
@@ -564,26 +628,26 @@ function AnalyticsTab() {
   ]
   
   // Calculate actual statistics
-  const mean = matchScores.reduce((a, b) => a + b, 0) / matchScores.length
+  const mean = matchScores.length > 0 ? matchScores.reduce((a, b) => a + b, 0) / matchScores.length : 0
   const sortedScores = [...matchScores].sort((a, b) => a - b)
-  const median = sortedScores[Math.floor(sortedScores.length / 2)]
-  const variance = matchScores.reduce((sum, score) => sum + Math.pow(score - mean, 2), 0) / matchScores.length
+  const median = sortedScores.length > 0 ? sortedScores[Math.floor(sortedScores.length / 2)] : 0
+  const variance = matchScores.length > 0 ? matchScores.reduce((sum, score) => sum + Math.pow(score - mean, 2), 0) / matchScores.length : 0
   const stdDev = Math.sqrt(variance)
 
   // Calculate actual skill correlations from candidate data
-  const allSkills = ['Python', 'Machine Learning', 'TensorFlow', 'SQL', 'Docker', 'PyTorch', 'Spark', 'AWS', 'Kubernetes']
+  const allSkills = Array.from(new Set(candidates.flatMap(c => c.skills))).slice(0, 9)
   const correlationMatrix = allSkills.slice(0, 4).map(skill1 => {
     return allSkills.slice(0, 4).map(skill2 => {
       if (skill1 === skill2) return 1.0
       
-      const candidatesWithSkill1 = CANDIDATES.filter(c => c.skills.includes(skill1))
-      const candidatesWithSkill2 = CANDIDATES.filter(c => c.skills.includes(skill2))
-      const candidatesWithBoth = CANDIDATES.filter(c => c.skills.includes(skill1) && c.skills.includes(skill2))
+      const candidatesWithSkill1 = candidates.filter(c => c.skills.includes(skill1))
+      const candidatesWithSkill2 = candidates.filter(c => c.skills.includes(skill2))
+      const candidatesWithBoth = candidates.filter(c => c.skills.includes(skill1) && c.skills.includes(skill2))
       
       if (candidatesWithSkill1.length === 0 || candidatesWithSkill2.length === 0) return 0
       
       // Simple correlation based on co-occurrence
-      const expectedBoth = (candidatesWithSkill1.length / CANDIDATES.length) * (candidatesWithSkill2.length / CANDIDATES.length) * CANDIDATES.length
+      const expectedBoth = (candidatesWithSkill1.length / candidates.length) * (candidatesWithSkill2.length / candidates.length) * candidates.length
       const actualBoth = candidatesWithBoth.length
       const correlation = actualBoth / Math.max(expectedBoth, 1)
       
@@ -665,7 +729,7 @@ function AnalyticsTab() {
               ))}
               
               {/* Data points with better spacing */}
-              {CANDIDATES.map((candidate, idx) => {
+              {candidates.map((candidate, idx) => {
                 const years = parseInt(candidate.experience) || 0
                 const x = 80 + years * 60
                 const y = 30 + (100 - candidate.match) * 2
@@ -732,7 +796,7 @@ function AnalyticsTab() {
             <h3 className="text-[15px] font-700 text-[#111827]">Skill Dimension Distribution</h3>
             <div className="flex items-center gap-2 text-[10px]">
               <span className="text-[#6B7280]">Candidates:</span>
-              <span className="font-700 text-[#635BFF]">{CANDIDATES.length}</span>
+              <span className="font-700 text-[#635BFF]">{candidates.length}</span>
             </div>
           </div>
           <div className="relative h-56">
@@ -765,9 +829,9 @@ function AnalyticsTab() {
               
               {/* Box plots for each dimension */}
               {[
-                { label: 'Semantic', data: CANDIDATES.map(c => c.semanticMatch), color: '#635BFF', x: 130 },
-                { label: 'Skills', data: CANDIDATES.map(c => c.skillMatch), color: '#10B981', x: 220 },
-                { label: 'Experience', data: CANDIDATES.map(c => c.experienceMatch), color: '#F59E0B', x: 310 },
+                { label: 'Semantic', data: candidates.map(c => c.semanticMatch), color: '#635BFF', x: 130 },
+                { label: 'Skills', data: candidates.map(c => c.skillMatch), color: '#10B981', x: 220 },
+                { label: 'Experience', data: candidates.map(c => c.experienceMatch), color: '#F59E0B', x: 310 },
               ].map((dimension, idx) => {
                 const sorted = [...dimension.data].sort((a, b) => a - b)
                 const q1 = sorted[Math.floor(sorted.length * 0.25)]
@@ -1010,7 +1074,7 @@ function AnalyticsTab() {
               })}
               
               {/* Candidate polygons - top 3 */}
-              {CANDIDATES.slice(0, 3).map((candidate, idx) => {
+              {candidates.slice(0, 3).map((candidate, idx) => {
                 const color = idx === 0 ? '#10B981' : idx === 1 ? '#635BFF' : '#F59E0B'
                 const semantic = candidate.semanticMatch
                 const skills = candidate.skillMatch
@@ -1063,7 +1127,7 @@ function AnalyticsTab() {
             </svg>
           </div>
           <div className="mt-4 flex items-center justify-center gap-4 text-[10px]">
-            {CANDIDATES.slice(0, 3).map((candidate, idx) => {
+            {candidates.slice(0, 3).map((candidate, idx) => {
               const color = idx === 0 ? '#10B981' : idx === 1 ? '#635BFF' : '#F59E0B'
               return (
                 <div key={candidate.id} className="flex items-center gap-1">
@@ -1175,23 +1239,37 @@ function AnalyticsTab() {
   )
 }
 
-function JobAnalysisTab() {
-  const requirements = [
-    { req: '4+ years of ML engineering experience', weight: 'High', matched: 6 },
-    { req: 'Python proficiency', weight: 'High', matched: 8 },
-    { req: 'TensorFlow or PyTorch', weight: 'High', matched: 5 },
-    { req: 'SQL and data querying', weight: 'Medium', matched: 7 },
-    { req: 'Docker containerization', weight: 'Medium', matched: 6 },
-    { req: 'Kubernetes orchestration', weight: 'Low', matched: 2 },
-    { req: 'AWS or GCP cloud experience', weight: 'Low', matched: 3 },
-    { req: 'ML pipeline development', weight: 'High', matched: 5 },
-  ]
+function JobAnalysisTab({ currentAnalysis }: { currentAnalysis: any }) {
+  // Use real data from the analysis if available
+  // Handle both old array format and new dict format
+  const requirementsData = currentAnalysis?.requirements
+  let requirements = []
+
+  if (Array.isArray(requirementsData)) {
+    // Old format: simple array
+    requirements = requirementsData.map((req: string) => ({
+      req,
+      weight: 'High',
+      matched: 0
+    }))
+  } else if (requirementsData && typeof requirementsData === 'object') {
+    // New format: dict with required and preferred
+    const allReqs = [
+      ...(requirementsData.required || []).map((req: string) => ({ req, weight: 'High' as const, matched: 0 })),
+      ...(requirementsData.preferred || []).map((req: string) => ({ req, weight: 'Medium' as const, matched: 0 }))
+    ]
+    requirements = allReqs
+  }
+
+  if (requirements.length === 0) {
+    requirements = [{ req: 'No requirements extracted', weight: 'Medium' as const, matched: 0 }]
+  }
 
   return (
     <div className="p-6 animate-fade-in-up">
       <div className="mb-5">
         <h1 className="text-[22px] font-800 text-[#111827] tracking-tight">Job Analysis</h1>
-        <p className="text-[13px] text-[#6B7280] mt-0.5">Senior Machine Learning Engineer — Requirements breakdown</p>
+        <p className="text-[13px] text-[#6B7280] mt-0.5">{currentAnalysis?.job_title || 'Job Analysis'}</p>
       </div>
       <div className="grid grid-cols-3 gap-4">
         <div className="col-span-2 bg-white rounded-lg border border-[#E5E7EB] overflow-hidden">
@@ -1216,14 +1294,11 @@ function JobAnalysisTab() {
         <div className="bg-white rounded-lg border border-[#E5E7EB] p-5">
           <h3 className="text-[14px] font-700 text-[#111827] mb-4">Role Summary</h3>
           <div className="space-y-3 text-[13px] text-[#6B7280] leading-relaxed">
-            <p>Senior ML Engineering role focused on production-grade ML systems at scale.</p>
-            <p>Strong emphasis on Python ecosystem and deep learning frameworks.</p>
-            <p>Cloud infrastructure skills are nice-to-have but not blocking.</p>
+            <p>AI-powered job analysis based on extracted requirements.</p>
+            <p>Skills and requirements are automatically identified from the job description.</p>
             <div className="mt-4 pt-4 border-t border-[#F3F4F6] space-y-2">
-              <div className="flex justify-between"><span>Requirements extracted</span><span className="font-600 text-[#111827]">8</span></div>
-              <div className="flex justify-between"><span>High priority</span><span className="font-600 text-[#EF4444]">4</span></div>
-              <div className="flex justify-between"><span>Medium priority</span><span className="font-600 text-[#F59E0B]">2</span></div>
-              <div className="flex justify-between"><span>Nice to have</span><span className="font-600 text-[#9CA3AF]">2</span></div>
+              <div className="flex justify-between"><span>Requirements extracted</span><span className="font-600 text-[#111827]">{requirements.length}</span></div>
+              <div className="flex justify-between"><span>Candidates analyzed</span><span className="font-600 text-[#10B981]">{currentAnalysis?.candidate_count || 0}</span></div>
             </div>
           </div>
         </div>

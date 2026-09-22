@@ -1,0 +1,217 @@
+import shutil
+import uuid
+from pathlib import Path
+from fastapi import BackgroundTasks, Depends, FastAPI, File, Form, HTTPException, UploadFile, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.openapi.utils import get_openapi
+from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
+from openpyxl import Workbook
+from sqlalchemy import select
+from sqlalchemy.orm import Session, selectinload
+from .config import settings
+from .database import Base, engine, get_db
+from .models import Analysis, Candidate
+from .schemas import AnalysisOut, CandidateOut
+from .services import analyse_job
+
+app = FastAPI(title="RecruitAI API", version="1.0.0", docs_url=None)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost:8443", "http://localhost:3000", "http://127.0.0.1:5173", "http://127.0.0.1:8443"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+def custom_openapi():
+    """Ensure Swagger UI renders the repeated multipart field as file inputs."""
+    if app.openapi_schema:
+        return app.openapi_schema
+    schema = get_openapi(title=app.title, version=app.version, routes=app.routes)
+    content = schema["paths"]["/api/v1/analyses"]["post"]["requestBody"]["content"]["multipart/form-data"]
+    body_schema = content["schema"]
+    if "$ref" in body_schema:
+        reference = body_schema["$ref"].rsplit("/", 1)[-1]
+        body_schema = schema["components"]["schemas"][reference]
+    body_schema["properties"]["resumes"] = {
+        "type": "array",
+        "items": {"type": "string", "format": "binary"},
+        "description": "Select 1–60 PDF resumes; each file must be 5 MB or smaller.",
+    }
+    content["encoding"] = {"resumes": {"contentType": "application/pdf"}}
+    app.openapi_schema = schema
+    return app.openapi_schema
+
+
+app.openapi = custom_openapi
+
+
+@app.get("/docs", include_in_schema=False)
+def swagger_docs():
+    """Swagger UI needs a small enhancement for one-picker multi-file selection."""
+    response = get_swagger_ui_html(openapi_url=app.openapi_url, title=f"{app.title} - Swagger UI")
+    enhancement = """
+<script>
+  const enableBulkResumePicker = () => {
+    document.querySelectorAll('input[type="file"]').forEach((input) => {
+      input.multiple = true;
+      input.setAttribute('accept', '.pdf,application/pdf');
+    });
+  };
+  new MutationObserver(enableBulkResumePicker).observe(document.body, { childList: true, subtree: true });
+  enableBulkResumePicker();
+</script>
+"""
+    return HTMLResponse(response.body.decode("utf-8").replace("</body>", enhancement + "</body>"))
+
+
+@app.on_event("startup")
+def startup() -> None:
+    settings.upload_dir.mkdir(parents=True, exist_ok=True)
+    Base.metadata.create_all(bind=engine)
+
+
+@app.get("/health")
+def health() -> dict:
+    return {
+        "status": "ok",
+        "max_resumes": settings.max_resumes_per_analysis,
+        "max_file_size_bytes": settings.max_file_size_bytes,
+        "ocr_available": bool(settings.tesseract_cmd or shutil.which("tesseract")),
+    }
+
+
+@app.post("/api/v1/analyses", response_model=AnalysisOut, status_code=status.HTTP_202_ACCEPTED)
+async def create_analysis(
+    background_tasks: BackgroundTasks,
+    job_description: str = Form(..., min_length=20),
+    job_title: str | None = Form(None),
+    resumes: list[UploadFile] = File(...),
+    db: Session = Depends(get_db),
+):
+    if not resumes:
+        raise HTTPException(422, "Upload at least one resume PDF.")
+    if len(resumes) > settings.max_resumes_per_analysis:
+        raise HTTPException(422, f"Upload at most {settings.max_resumes_per_analysis} resumes per analysis.")
+    if invalid := [upload.filename or "unnamed" for upload in resumes if not (upload.filename or "").lower().endswith(".pdf")]:
+        raise HTTPException(422, f"Only PDF resumes are accepted: {', '.join(invalid)}")
+
+    analysis = Analysis(job_title=job_title, job_description=job_description, status="queued")
+    db.add(analysis)
+    db.commit(); db.refresh(analysis)
+    batch_dir = settings.upload_dir / analysis.id
+    batch_dir.mkdir(parents=True, exist_ok=False)
+    paths: list[tuple[str, str]] = []
+    try:
+        for upload in resumes:
+            filename = Path(upload.filename or "resume.pdf").name
+            destination = batch_dir / f"{uuid.uuid4()}-{filename}"
+            written = 0
+            signature = bytearray()
+            with destination.open("wb") as output:
+                while chunk := await upload.read(1024 * 1024):
+                    written += len(chunk)
+                    if len(signature) < 5:
+                        signature.extend(chunk[: 5 - len(signature)])
+                    if written > settings.max_file_size_bytes:
+                        output.close(); destination.unlink(missing_ok=True)
+                        raise HTTPException(413, f"{filename} exceeds the 5 MB per-file limit.")
+                    output.write(chunk)
+            if not bytes(signature).startswith(b"%PDF-"):
+                destination.unlink(missing_ok=True)
+                raise HTTPException(422, f"{filename} is not a valid PDF file.")
+            paths.append((filename, str(destination)))
+    except Exception:
+        shutil.rmtree(batch_dir, ignore_errors=True)
+        db.delete(analysis); db.commit()
+        raise
+    background_tasks.add_task(analyse_job, analysis.id, paths)
+    return to_analysis_out(analysis, include_candidates=False)
+
+
+def to_analysis_out(analysis: Analysis, include_candidates: bool = True) -> AnalysisOut:
+    candidates = sorted(analysis.candidates, key=lambda item: item.overall_score, reverse=True) if include_candidates else []
+    # Handle both old list format and new dict format for backward compatibility
+    requirements = analysis.requirements if isinstance(analysis.requirements, dict) else {"all": analysis.requirements or [], "required": [], "preferred": []}
+    return AnalysisOut(id=analysis.id, job_title=analysis.job_title, requirements=requirements, status=analysis.status,
+                       error=analysis.error, created_at=analysis.created_at, completed_at=analysis.completed_at,
+                       candidate_count=len(analysis.candidates), candidates=[CandidateOut.model_validate(item) for item in candidates])
+
+
+@app.get("/api/v1/analyses", response_model=list[AnalysisOut])
+def list_analyses(db: Session = Depends(get_db)):
+    analyses = db.scalars(select(Analysis).order_by(Analysis.created_at.desc())).all()
+    return [to_analysis_out(analysis, include_candidates=False) for analysis in analyses]
+
+
+@app.get("/api/v1/analyses/{analysis_id}", response_model=AnalysisOut)
+def get_analysis(analysis_id: str, db: Session = Depends(get_db)):
+    analysis = db.scalar(select(Analysis).options(selectinload(Analysis.candidates)).where(Analysis.id == analysis_id))
+    if not analysis: raise HTTPException(404, "Analysis not found.")
+    return to_analysis_out(analysis)
+
+
+@app.get("/api/v1/analyses/{analysis_id}/report.xlsx")
+def download_report(analysis_id: str, db: Session = Depends(get_db)):
+    analysis = db.scalar(select(Analysis).options(selectinload(Analysis.candidates)).where(Analysis.id == analysis_id))
+    if not analysis: raise HTTPException(404, "Analysis not found.")
+    if analysis.status != "completed": raise HTTPException(409, "Analysis is not complete.")
+    workbook = Workbook(); summary = workbook.active; summary.title = "Summary"
+    summary.append(["Job title", analysis.job_title or "Untitled role"]); summary.append(["Candidates", len(analysis.candidates)])
+    
+    # Handle requirements in new dict format
+    if isinstance(analysis.requirements, dict):
+        req_text = f"Required: {', '.join(analysis.requirements.get('required', []))} | Preferred: {', '.join(analysis.requirements.get('preferred', []))}"
+    else:
+        req_text = ", ".join(analysis.requirements or [])
+    summary.append(["Requirements", req_text])
+    ranking = workbook.create_sheet("Candidate ranking")
+    ranking.append(["Rank", "Candidate", "Email", "Overall", "Semantic", "Keyword", "Experience", "Recommendation", "Skills", "Missing skills", "Insight"])
+    for rank, candidate in enumerate(sorted(analysis.candidates, key=lambda item: item.overall_score, reverse=True), 1):
+        ranking.append([rank, candidate.name, candidate.email, candidate.overall_score, candidate.semantic_score, candidate.keyword_score, candidate.experience_score, candidate.recommendation, ", ".join(candidate.skills), ", ".join(candidate.missing_skills), candidate.insight])
+    for sheet in workbook.worksheets:
+        sheet.freeze_panes = "A2"; sheet.auto_filter.ref = sheet.dimensions
+        for column in sheet.columns:
+            sheet.column_dimensions[column[0].column_letter].width = min(max(len(str(cell.value or "")) for cell in column) + 2, 50)
+    from io import BytesIO
+    buffer = BytesIO(); workbook.save(buffer); buffer.seek(0)
+    return StreamingResponse(buffer, media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", headers={"Content-Disposition": f'attachment; filename="recruitai-{analysis_id}.xlsx"'})
+
+
+@app.get("/api/v1/candidates/{candidate_id}/resume")
+def download_candidate_resume(candidate_id: str, db: Session = Depends(get_db)):
+    """Download the original resume PDF for a specific candidate."""
+    candidate = db.scalar(select(Candidate).where(Candidate.id == candidate_id))
+    if not candidate: raise HTTPException(404, "Candidate not found.")
+    
+    # Find the resume file in the upload directory
+    batch_dir = settings.upload_dir / candidate.analysis_id
+    if not batch_dir.exists(): raise HTTPException(404, "Analysis files not found.")
+    
+    # Look for the file that matches the candidate's filename
+    # Files are stored as UUID-originalfilename.pdf
+    resume_files = list(batch_dir.glob("*.pdf"))
+    matching_file = None
+    for file_path in resume_files:
+        # Extract the original filename from the UUID-filename format
+        # Format: UUID-originalfilename.pdf
+        stored_filename = file_path.name
+        # Check if the original filename is at the end (after the UUID and dash)
+        if stored_filename.endswith(f"-{candidate.filename}") or stored_filename == candidate.filename:
+            matching_file = file_path
+            break
+        # Also try partial matching for edge cases
+        if candidate.filename in stored_filename:
+            matching_file = file_path
+            break
+    
+    if not matching_file: raise HTTPException(404, "Resume file not found.")
+    
+    return FileResponse(
+        path=str(matching_file),
+        media_type="application/pdf",
+        filename=candidate.filename,
+        headers={"Content-Disposition": f'inline; filename="{candidate.filename}"'}
+    )

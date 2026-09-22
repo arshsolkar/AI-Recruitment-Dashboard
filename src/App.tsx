@@ -5,35 +5,88 @@ import NewAnalysis from './screens/NewAnalysis'
 import AiScanning from './screens/AiScanning'
 import Overview from './screens/Overview'
 import CandidateAnalysis from './screens/CandidateAnalysis'
-import { CANDIDATES } from './data/candidates'
-import { generateExcelReport } from './utils/exportReport'
+import { createAnalysis, pollAnalysis, downloadReport, type AnalysisResponse } from './utils/api'
+import { convertToCandidate } from './data/candidates'
 
 type Screen = 'analysis' | 'scanning' | 'overview' | 'candidate'
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('analysis')
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>('overview')
-  const [selectedCandidateId, setSelectedCandidateId] = useState<number>(1)
+  const [selectedCandidateId, setSelectedCandidateId] = useState<string>('')
+  const [currentAnalysis, setCurrentAnalysis] = useState<AnalysisResponse | null>(null)
+  const [analysisError, setAnalysisError] = useState<string | null>(null)
 
-  const selectedCandidate = CANDIDATES.find((c) => c.id === selectedCandidateId) ?? CANDIDATES[0]
+  const selectedCandidate = currentAnalysis?.candidates.find((c) => c.id === selectedCandidateId)
+  const jobRequirements = currentAnalysis?.requirements || { required: [], preferred: [] }
+  const candidates = currentAnalysis?.candidates.map(c => convertToCandidate(c, currentAnalysis.id, jobRequirements)) || []
 
-  const handleAnalyze = () => setScreen('scanning')
-  const handleScanComplete = () => setScreen('overview')
-  const handleNewAnalysis = () => setScreen('analysis')
+  const handleAnalyze = async (jobDescription: string, jobTitle: string | undefined, files: File[]) => {
+    try {
+      setAnalysisError(null)
+      const analysis = await createAnalysis({
+        job_description: jobDescription,
+        job_title: jobTitle,
+        resumes: files,
+      })
+      setCurrentAnalysis(analysis)
+      setScreen('scanning')
+    } catch (error) {
+      setAnalysisError(error instanceof Error ? error.message : 'Failed to start analysis')
+    }
+  }
 
-  const handleSelectCandidate = (id: number) => {
+  const handleScanComplete = (completedAnalysis: AnalysisResponse) => {
+    setCurrentAnalysis(completedAnalysis)
+    setScreen('overview')
+  }
+
+  const handleNewAnalysis = () => {
+    setCurrentAnalysis(null)
+    setAnalysisError(null)
+    setSelectedCandidateId('')
+    setScreen('analysis')
+  }
+
+  const handleSelectCandidate = (id: string) => {
     setSelectedCandidateId(id)
     setScreen('candidate')
   }
 
   const handleBack = () => setScreen('overview')
 
+  const handleExportReport = async () => {
+    if (!currentAnalysis) return
+    try {
+      const blob = await downloadReport(currentAnalysis.id)
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `recruitai-${currentAnalysis.id}.xlsx`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Failed to download report:', error)
+    }
+  }
+
   if (screen === 'analysis') {
     return <NewAnalysis onAnalyze={handleAnalyze} />
   }
 
   if (screen === 'scanning') {
-    return <AiScanning onComplete={handleScanComplete} />
+    return (
+      <AiScanning
+        analysisId={currentAnalysis?.id || ''}
+        onComplete={handleScanComplete}
+        onError={(error) => {
+          setAnalysisError(error)
+          setScreen('analysis')
+        }}
+      />
+    )
   }
 
   return (
@@ -47,17 +100,19 @@ export default function App() {
         onNewAnalysis={handleNewAnalysis}
       />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <TopBar onNewAnalysis={handleNewAnalysis} onExportReport={generateExcelReport} />
+        <TopBar onNewAnalysis={handleNewAnalysis} onExportReport={handleExportReport} currentAnalysis={currentAnalysis} />
         <main className="flex-1 overflow-y-auto min-h-0">
           {screen === 'overview' && (
             <Overview
               activeTab={sidebarTab}
+              candidates={candidates}
               onSelectCandidate={handleSelectCandidate}
+              currentAnalysis={currentAnalysis}
             />
           )}
-          {screen === 'candidate' && (
+          {screen === 'candidate' && selectedCandidate && (
             <CandidateAnalysis
-              candidate={selectedCandidate}
+              candidate={convertToCandidate(selectedCandidate, currentAnalysis.id, jobRequirements)}
               onBack={handleBack}
             />
           )}

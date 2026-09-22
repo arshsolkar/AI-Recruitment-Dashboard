@@ -1,5 +1,5 @@
 export interface Candidate {
-  id: number
+  id: string
   name: string
   initials: string
   title: string
@@ -15,6 +15,21 @@ export interface Candidate {
   skillMatch: number
   experienceMatch: number
   aiInsight: string
+  email?: string | null
+  filename?: string
+  analysisId?: string
+  experienceDetails?: any[]
+  jobRequirements?: {
+    required: string[]
+    preferred: string[]
+  }
+  entities?: {
+    emails: string[]
+    phones: string[]
+    experience_years: number
+    organizations: string[]
+    locations: string[]
+  }
 }
 
 export interface SkillCoverage {
@@ -26,7 +41,7 @@ export interface SkillCoverage {
 
 export const CANDIDATES: Candidate[] = [
   {
-    id: 1,
+    id: '1',
     name: 'Rahul Sharma',
     initials: 'RS',
     title: 'Senior ML Engineer',
@@ -49,7 +64,7 @@ export const CANDIDATES: Candidate[] = [
       'Candidate demonstrates strong alignment with the technical requirements, particularly in Python, Machine Learning and SQL. The primary gap is cloud infrastructure experience (Kubernetes, AWS), but solid ML fundamentals and Docker experience suggest a fast learning curve.',
   },
   {
-    id: 2,
+    id: '2',
     name: 'Priya Patel',
     initials: 'PP',
     title: 'Data Scientist',
@@ -72,7 +87,7 @@ export const CANDIDATES: Candidate[] = [
       'Strong match across core data science competencies. Candidate excels in statistical modeling and the Python ecosystem. Lacks containerization experience but compensates with deep ML knowledge and strong research background from IISc.',
   },
   {
-    id: 3,
+    id: '3',
     name: 'Aman Kumar',
     initials: 'AK',
     title: 'AI Engineer',
@@ -95,7 +110,7 @@ export const CANDIDATES: Candidate[] = [
       'Well-rounded AI engineer with strong production experience. Above-average tenure at 6 years compensates for some skill gaps in modern cloud tooling. MLflow and MLOps experience is a strong differentiator for this role.',
   },
   {
-    id: 4,
+    id: '4',
     name: 'Sneha Joshi',
     initials: 'SJ',
     title: 'ML Researcher',
@@ -118,7 +133,7 @@ export const CANDIDATES: Candidate[] = [
       'Exceptional academic credentials with strong research depth and a NeurIPS publication. Excellent theoretical foundation and cutting-edge ML knowledge. Production experience gaps may require onboarding investment but ceiling is very high.',
   },
   {
-    id: 5,
+    id: '5',
     name: 'Rohan Mehta',
     initials: 'RM',
     title: 'Data Engineer',
@@ -141,7 +156,7 @@ export const CANDIDATES: Candidate[] = [
       'Excellent data engineering skills with strong pipeline and infrastructure expertise. Primary gap is ML modeling experience. An ideal fit for the ML infrastructure layer; less suited for core modeling work.',
   },
   {
-    id: 6,
+    id: '6',
     name: 'Ananya Singh',
     initials: 'AS',
     title: 'Software Engineer',
@@ -164,7 +179,7 @@ export const CANDIDATES: Candidate[] = [
       'Solid software engineering background with growing ML platform exposure. Missing several required technical ML skills. Better suited for ML platform engineering roles rather than core modeling work.',
   },
   {
-    id: 7,
+    id: '7',
     name: 'Vikram Nair',
     initials: 'VN',
     title: 'Backend Engineer',
@@ -187,7 +202,7 @@ export const CANDIDATES: Candidate[] = [
       'Strong backend engineering skills but minimal AI/ML exposure. Docker and Python competency are positives. Significant upskilling would be needed for core ML responsibilities. Not recommended for this role.',
   },
   {
-    id: 8,
+    id: '8',
     name: 'Divya Reddy',
     initials: 'DR',
     title: 'Data Analyst',
@@ -254,4 +269,63 @@ export function getInitialsColor(initials: string): string {
   ]
   const idx = (initials.charCodeAt(0) + initials.charCodeAt(1)) % colors.length
   return colors[idx]
+}
+
+import type { CandidateResponse } from '../utils/api'
+
+export function convertToCandidate(response: CandidateResponse, analysisId?: string, jobRequirements?: { required: string[], preferred: string[] }): Candidate {
+  const nameParts = response.name.split(' ')
+  const initials = nameParts.length >= 2 
+    ? (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase()
+    : nameParts[0]?.substring(0, 2).toUpperCase() || '??'
+  
+  const experienceYears = response.entities?.experience_years || 0
+  const experience = experienceYears > 0 ? `${experienceYears} years` : 'Not specified'
+  
+  const organizations = response.entities?.organizations || []
+  const locations = response.entities?.locations || []
+  
+  // Better title extraction - filter out non-job titles from organizations
+  const jobTitleKeywords = ['developer', 'engineer', 'manager', 'analyst', 'architect', 'consultant', 'lead', 'senior', 'junior', 'principal', 'director']
+  const title = organizations.find(org => 
+    jobTitleKeywords.some(keyword => org.toLowerCase().includes(keyword))
+  ) || organizations[0] || 'Professional'
+  
+  // Better location extraction - filter out non-locations
+  const locationKeywords = ['street', 'road', 'avenue', 'boulevard', 'lane', 'drive', 'court', 'place', 'way', 'st', 'rd', 'ave', 'blvd']
+  const location = locations.find(loc => 
+    locationKeywords.some(keyword => loc.toLowerCase().includes(keyword)) ||
+    loc.match(/^[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?,\s*[A-Z]{2}$/) // City, State format
+  ) || locations[0] || 'Not specified'
+  
+  // Use extracted education from backend
+  const education = response.education || 'Not specified'
+  
+  // Use extracted projects from backend
+  const projects = response.projects || []
+  
+  return {
+    id: response.id,
+    name: response.name,
+    initials,
+    title,
+    match: response.overall_score,
+    recommendation: response.recommendation as Candidate['recommendation'],
+    experience,
+    skills: response.skills,
+    missingSkills: response.missing_skills,
+    education,
+    location,
+    projects,
+    semanticMatch: response.semantic_score,
+    skillMatch: response.keyword_score,
+    experienceMatch: response.experience_score,
+    aiInsight: response.insight,
+    email: response.email,
+    filename: response.filename,
+    analysisId,
+    experienceDetails: response.experience_details,
+    jobRequirements,
+    entities: response.entities,
+  }
 }

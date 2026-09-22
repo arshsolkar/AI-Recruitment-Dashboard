@@ -1,49 +1,70 @@
 import { useState, useEffect } from 'react'
+import { pollAnalysis, type AnalysisResponse } from '../utils/api'
 
 interface AiScanningProps {
-  onComplete: () => void
+  analysisId: string
+  onComplete: (analysis: any) => void
+  onError: (error: string) => void
 }
 
 const STAGES = [
-  { label: 'Job description analyzed', detail: 'Extracted 24 key requirements' },
-  { label: 'Resume text extracted', detail: 'Processed 8 PDF documents' },
+  { label: 'Job description analyzed', detail: 'Extracting key requirements' },
+  { label: 'Resume text extracted', detail: 'Processing PDF documents' },
   { label: 'Identifying candidate skills', detail: 'Running NLP skill detection' },
   { label: 'Calculating semantic similarity', detail: 'Vector embedding comparison' },
-  { label: 'Ranking candidates', detail: 'Scoring against 18 criteria' },
+  { label: 'Ranking candidates', detail: 'Scoring against criteria' },
   { label: 'Generating recruitment insights', detail: 'Building intelligence report' },
 ]
 
-export default function AiScanning({ onComplete }: AiScanningProps) {
-  const [currentStage, setCurrentStage] = useState(2)
+export default function AiScanning({ analysisId, onComplete, onError }: AiScanningProps) {
+  const [currentStage, setCurrentStage] = useState(1)
   const [processed, setProcessed] = useState(0)
   const [done, setDone] = useState(false)
-  const total = 50
+  const [total, setTotal] = useState(0)
 
   useEffect(() => {
-    const stageTimers: ReturnType<typeof setTimeout>[] = []
-    STAGES.slice(2).forEach((_, i) => {
-      stageTimers.push(
-        setTimeout(() => setCurrentStage(2 + i + 1), (i + 1) * 1400)
-      )
-    })
-    return () => stageTimers.forEach(clearTimeout)
-  }, [])
+    if (!analysisId) return
 
-  useEffect(() => {
+    // Start with simulated progress for visual feedback
     let count = 0
     const interval = setInterval(() => {
       count++
       setProcessed(count)
-      if (count >= total) {
+      if (count >= 95) {
         clearInterval(interval)
-        setTimeout(() => setDone(true), 600)
-        setTimeout(() => onComplete(), 1800)
       }
-    }, 90)
-    return () => clearInterval(interval)
-  }, [onComplete])
+    }, 80)
 
-  const progressPct = (processed / total) * 100
+    // Poll for real analysis status
+    pollAnalysis(
+      analysisId,
+      (analysis: AnalysisResponse) => {
+        setTotal(analysis.candidate_count)
+        
+        // Update stage based on status
+        if (analysis.status === 'queued') {
+          setCurrentStage(1)
+        } else if (analysis.status === 'processing') {
+          setCurrentStage(2)
+        }
+      },
+      2000
+    )
+      .then((completedAnalysis) => {
+        clearInterval(interval)
+        setDone(true)
+        setProcessed(100)
+        setTimeout(() => onComplete(completedAnalysis), 1500)
+      })
+      .catch((error) => {
+        clearInterval(interval)
+        onError(error.message)
+      })
+
+    return () => clearInterval(interval)
+  }, [analysisId, onComplete, onError])
+
+  const progressPct = total > 0 ? (processed / total) * 100 : 0
 
   return (
     <div className="min-h-screen bg-[#F7F8FA] flex flex-col items-center justify-center relative overflow-hidden">
@@ -168,13 +189,13 @@ export default function AiScanning({ onComplete }: AiScanningProps) {
           {done ? (
             <div style={{ animation: 'fade-in-up 0.4s ease both' }}>
               <div className="text-[22px] font-700 text-[#111827] mb-1">Analysis Complete</div>
-              <div className="text-[14px] text-[#6B7280]">Ranked {total} candidates · 12 shortlisted · Loading dashboard…</div>
+              <div className="text-[14px] text-[#6B7280]">Ranked {total} candidates · Loading dashboard…</div>
             </div>
           ) : (
             <>
               <div className="text-[22px] font-700 text-[#111827] mb-1">Processing Resumes</div>
               <div className="text-[14px] text-[#6B7280]">
-                Analyzing candidate {Math.min(processed, total)} of {total}
+                {total > 0 ? `Analyzing ${total} candidates` : 'Processing analysis'}
               </div>
             </>
           )}
