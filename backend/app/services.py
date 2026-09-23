@@ -1,4 +1,5 @@
 from datetime import datetime
+from pathlib import Path
 from typing import Optional, Dict
 from .database import SessionLocal
 from .models import Analysis, Candidate
@@ -190,7 +191,7 @@ def analyse_job(analysis_id: str, upload_paths: list[tuple[str, str]]) -> None:
             insight = " | ".join(insight_parts)
             
             db.add(Candidate(
-                analysis_id=analysis.id, filename=filename, name=candidate_name,
+                analysis_id=analysis.id, filename=filename, stored_filename=Path(path).name, name=candidate_name,
                 email=(entities.get("emails") or [None])[0], text=text, skills=sorted(skills),
                 missing_skills=missing_required + missing_preferred, entities=entities,
                 projects=projects, education=education, experience_details=experience_details,

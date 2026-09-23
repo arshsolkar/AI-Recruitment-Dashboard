@@ -16,14 +16,19 @@ export default function App() {
   const [selectedCandidateId, setSelectedCandidateId] = useState<string>('')
   const [currentAnalysis, setCurrentAnalysis] = useState<AnalysisResponse | null>(null)
   const [analysisError, setAnalysisError] = useState<string | null>(null)
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
 
   const selectedCandidate = currentAnalysis?.candidates.find((c) => c.id === selectedCandidateId)
-  const jobRequirements = currentAnalysis?.requirements || { required: [], preferred: [] }
+  const rawReqs = currentAnalysis?.requirements
+  const jobRequirements: { required: string[]; preferred: string[] } = Array.isArray(rawReqs)
+    ? { required: rawReqs, preferred: [] }
+    : rawReqs || { required: [], preferred: [] }
   const candidates = currentAnalysis?.candidates.map(c => convertToCandidate(c, currentAnalysis.id, jobRequirements)) || []
 
   const handleAnalyze = async (jobDescription: string, jobTitle: string | undefined, files: File[]) => {
     try {
       setAnalysisError(null)
+      setUploadedFiles(files)
       const analysis = await createAnalysis({
         job_description: jobDescription,
         job_title: jobTitle,
@@ -80,6 +85,7 @@ export default function App() {
     return (
       <AiScanning
         analysisId={currentAnalysis?.id || ''}
+        uploadedFiles={uploadedFiles}
         onComplete={handleScanComplete}
         onError={(error) => {
           setAnalysisError(error)
@@ -110,7 +116,7 @@ export default function App() {
               currentAnalysis={currentAnalysis}
             />
           )}
-          {screen === 'candidate' && selectedCandidate && (
+          {screen === 'candidate' && selectedCandidate && currentAnalysis && (
             <CandidateAnalysis
               candidate={convertToCandidate(selectedCandidate, currentAnalysis.id, jobRequirements)}
               onBack={handleBack}

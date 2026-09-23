@@ -1,0 +1,2805 @@
+[
+  {
+    "filename": "Image_10.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 16.82,
+        "prompt_len": 4103,
+        "response_snippet": "{\n  \"name\": \"Kennedy Klekamp\",\n  \"email\": \"kennedy.klekamp@gmail.com\",\n  \"phone\": \"254 103-9272\",\n  \"skills\": [\n    {\n      \"name\": \"Django\",\n      \"category\": \"Technology\"\n    },\n    {\n      \"name\": \"Flask\",\n      \"category\": \"Technology\"\n    },\n    {\n      \"name\": \"NumPy\",\n      \"category\": \"Techn"
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 2645,
+    "raw_text_snippet": "Kennedy Klekamp | Python Developer | & Profile Details | Python Developer with 1 year of experience in designing, developing, kennedy. klekamp@gmail.com | and implementing software solutions using Python programming (254) 103-9272 | language. Proficient in creating web applications, integrating APIs, 123 Aspen Lane, Boulder, CO 80301 | and leveraging data analysis libraries. Adept at working in agile | environments, collaborating with cross-functional teams, and adapting to . | new technologies. Highly skilled ",
+    "extracted_name": "Kennedy Klekamp",
+    "extracted_experience_years": 8.7,
+    "work_experience": [
+      {
+        "title": "Role",
+        "company": "Inceed",
+        "start_date": "Mar 2023",
+        "end_date": "Present",
+        "description": "Senior Python Developer at Inceed, CO rs\n* Developed an optimized Python-based application for a major client,\nresulting in a 30% increase in efficiency and a 25% reduction in NumPy processing time. Baigiae\n* Implemented an automated testing framework that reduced code review time by 40% and increased overall code quality, leading to a TensorFlow 15% reduction in reported bugs.\n* Spearheaded the migration of a legacy system to a modern SQLAlchemy Python-based platform, which improved system performance by 50% ee;\nand decreased maintenance costs by 20%. Jupyter\n* Mentored a team of junior developers, leading to a 100% retention rate \u2014\u2014\u2014\u2014\u2014E\nand a 35% increase in team productivity within six months."
+      },
+      {
+        "title": "Role",
+        "company": "Techtonic Group",
+        "start_date": "Aug 2022",
+        "end_date": "Jan 2023",
+        "description": "Junior Python Developer at Techtonic Group, CO Languages\n* Developed an efficient data processing pipeline for a major client, English\nresulting in a 50% reduction in processing time and a 30% Mandarin\nimprovement in data accuracy.\n* Implemented an automated testing framework for critical applications, leading to a significant decrease in software defects by Hobbies\n40% and a 25% faster release cycle.\n* Optimized and refactored legacy codebase, enhancing overall Developing open-source projects\nperformance by 35% and reducing maintenance costs by 20% for the Participating in coding\ncompany. competitions"
+      }
+    ],
+    "employment_date_ranges": [
+      {
+        "start": "Mar 2023",
+        "end": "Present"
+      },
+      {
+        "start": "Aug 2022",
+        "end": "Jan 2023"
+      }
+    ],
+    "skills": [
+      "Agile",
+      "Algorithms",
+      "Artificial Intelligence",
+      "Automation",
+      "Data Structures",
+      "Django",
+      "English",
+      "Flask",
+      "Jest",
+      "Jupyter",
+      "Machine Learning",
+      "Mandarin",
+      "NumPy",
+      "Performance",
+      "Problem Solving",
+      "Python",
+      "Rust",
+      "SonarQube",
+      "Sqlalchemy",
+      "TensorFlow",
+      "Testing"
+    ],
+    "education": "Bachelor of Science in Software Engineering with a focus on Python Development at University",
+    "projects": [
+      "Skills\nih Employment History Django\nSenior Python Developer at Inceed, CO rs\nMar 2023 - Present Flask\n* Developed an optimized Python-based application for a major client,\nresulting in a 30% increase in efficiency and a 25% reduction in NumPy\nprocessing time",
+      "Baigiae\n* Implemented an automated testing framework that reduced code\nreview time by 40% and increased overall code quality, leading to a TensorFlow\n15% reduction in reported bugs",
+      "Junior Python Developer at Techtonic Group, CO Languages\nAug 2022 - Jan 2023 '\n* Developed an efficient data processing pipeline for a major client, English\nresulting in a 50% reduction in processing time and a 30% Mandarin\nimprovement in data accuracy",
+      "* Implemented an automated testing framework for critical\napplications, leading to a significant decrease in software defects by Hobbies\n40% and a 25% faster release cycle"
+    ],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 8.7,
+    "independent_date_ranges": [
+      {
+        "start": "2017-08",
+        "end": "2022-05",
+        "years": 4.7
+      },
+      {
+        "start": "2022-08",
+        "end": "2023-01",
+        "years": 0.4
+      },
+      {
+        "start": "2023-03",
+        "end": "2026-09",
+        "years": 3.5
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": []
+  },
+  {
+    "filename": "Image_16.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 9.64,
+        "prompt_len": 3590,
+        "response_snippet": "{\n  \"name\": \"Vannesa Branch\",\n  \"email\": null,\n  \"phone\": null,\n  \"experience\": [\n    {\n      \"company\": \"Johns, Batz and O'Hara\",\n      \"start_date\": \"07/2018\",\n      \"end_date\": \"present\",\n      \"description\": \"Senior Python Developer in Chicago, IL. Experience in database architecture, data model"
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 2144,
+    "raw_text_snippet": "609 VANNESA BRANCH, CHICAGO, IL | PHONE | EXPERIENCE JOHNS, BATZ AND O'HARA 07/2018 \u2014 present | Chicago, IL // Senior Python Developer | e Experience in database architecture, data modeling and data warehousing, experience in using | agile tools JIRA, Git, Team City, Agile Central | e Previous experience in using Git/Stash for source and version control, Autosys for batch | control and Team City/ Nexus for build/deployment | e Experience in DevOps, source control, unit and integration testing, continuous integr",
+    "extracted_name": "Vannesa Branch",
+    "extracted_experience_years": 13.1,
+    "work_experience": [
+      {
+        "title": "Role",
+        "company": "Johns, Batz and O'Hara",
+        "start_date": "07/2018",
+        "end_date": "present",
+        "description": "Senior Python Developer in Chicago, IL. Experience in database architecture, data modeling and data warehousing, experience in using agile tools JIRA, Git, Team City, Agile Central. Previous experience in using Git/Stash for source and version control, Autosys for batch control and Team City/Nexus for build/deployment. Experience in DevOps, source control, unit and integration testing, continuous integration, release management, and other software development practices. Exposure to Business Visualization tools like Qlikview, Qliksense, Tableau. Excellent collaborator and fantastic teammate with solid leadership skills. Experience in Project delivery and software engineering projects in a corporate or enterprise environment using Java and Python."
+      },
+      {
+        "title": "Role",
+        "company": "Ritchie-Ward",
+        "start_date": "07/2013",
+        "end_date": "06/2018",
+        "description": "Python Developer in Chicago, IL. Skilled in software solution design and problem-solving techniques. Hands-on experience developing web services. Experience with data analytics - both tools impact to data structures and implementation. Design and implementation of software using Python. Frontend development using JavaScript, HTML and CSS. CI/CD support for the project. Assuring code quality and adherence to coding standards on projects. Excellent verbal and written communications, comfortable working with different levels of management, high attention to detail."
+      }
+    ],
+    "employment_date_ranges": [
+      {
+        "start": "07/2018",
+        "end": "present"
+      },
+      {
+        "start": "07/2013",
+        "end": "06/2018"
+      }
+    ],
+    "skills": [
+      "Agile",
+      "Automation",
+      "CI/CD",
+      "CSS",
+      "Data Structures",
+      "DevOps",
+      "Frontend",
+      "Git",
+      "Grafana",
+      "HTML",
+      "Java",
+      "JavaScript",
+      "Jira",
+      "Performance",
+      "Problem Solving",
+      "Python",
+      "Qlik",
+      "SOLID",
+      "Software Architecture",
+      "SonarQube",
+      "Tableau",
+      "TeamCity",
+      "Testing"
+    ],
+    "education": "COLUMBUS COLLEGE OF ART AND DESIGN Bachelor's in Computer Science",
+    "projects": [
+      "environment using Java and Python",
+      "WARD 07/2013 \u2014 06/2018",
+      "Chicago, IL // Python Developer",
+      "e Skilled in software solution design and problem",
+      "solving techniques"
+    ],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 13.1,
+    "independent_date_ranges": [
+      {
+        "start": "2013-07",
+        "end": "2018-06",
+        "years": 4.9
+      },
+      {
+        "start": "2018-07",
+        "end": "2026-09",
+        "years": 8.2
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [
+      "EXP\u2192PROJECTS (date range): 'WARD 07/2013 \u2014 06/2018'"
+    ],
+    "experience_flags": []
+  },
+  {
+    "filename": "Image_2.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 3.62,
+        "prompt_len": 4197,
+        "response_snippet": "{\n  \"name\": \"Helen Mackay\",\n  \"email\": \"helen.mackay@gmail.com\",\n  \"phone\": \"+1-271-199-8643\",\n  \"languages\": [\"Python\", \"JavaScript\", \"SQL\", \"ML algorithms\", \"MySQL\", \"MongoDB\", \"AWS\", \"MatPlotlib\", \"English\"]\n  }"
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 2733,
+    "raw_text_snippet": "Junior Python Developer | | ; | f NI SI | = | \\ #1-271-199-8643 @ helen.mackay@gmail,com. | ~\\\\2-github:to/helen.python_ go S| 4 | @ Chicago, IL A : | | ef iis ly 4 | SUMMARY SKILLS | Junior database developer with Python Associate in Programming Programming | certification. Knowledgeable in data fetching and organization, | data visualisation, MySQL, MongoDB and AWS. Some knowledge | ML algorithms. Python SQL = JavaScript | Data Skills | EDUCATION | ; D Al jumP | B.S. in Computer Systems and ax EES MVS ANS) er | Techn",
+    "extracted_name": "Helen Mackay",
+    "extracted_experience_years": 9.0,
+    "work_experience": [],
+    "employment_date_ranges": [],
+    "skills": [
+      "AWS",
+      "Algorithms",
+      "Communication",
+      "Data Science",
+      "Git",
+      "Go",
+      "JavaScript",
+      "Machine Learning",
+      "MongoDB",
+      "MySQL",
+      "Python",
+      "SQL",
+      "Scikit-learn",
+      "Security",
+      "Tableau",
+      "TensorFlow",
+      "Testing"
+    ],
+    "education": "; D Al jumP B.S. in Computer Systems and ax EES MVS ANS) er Technologies MatPlotlib ML Algorithms University of Chicago 3.9 / 4.0 Ee ere _ Se",
+    "projects": [],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 9.0,
+    "independent_date_ranges": [
+      {
+        "start": "2017-09",
+        "end": "2026-09",
+        "years": 9.0
+      },
+      {
+        "start": "2018-09",
+        "end": "2026-09",
+        "years": 8.0
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": []
+  },
+  {
+    "filename": "Image_20.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 15.73,
+        "prompt_len": 3690,
+        "response_snippet": "{\n  \"name\": \"ROBERT SMITH\",\n  \"email\": \"Info@qwikresume.com\",\n  \"skills\": [\n    {\n      \"name\": \"DJANGO\",\n      \"category\": \"Programming Languages\"\n    },\n    {\n      \"name\": \"JAVASCRIPT\",\n      \"category\": \"Programming Languages\"\n    },\n    {\n      \"name\": \"MYSQL\",\n      \"category\": \"Databases\"\n   "
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 2239,
+    "raw_text_snippet": "Python Developer / QA Email: Info@qwikresurne.com | Automation Tester Website: | ROBERT SMITH acne | Alabarna, | Objective | Around 5 years total IT experience as a software engineer and Python Developer and Salesforce | Platform. Extensive experience In Python Django web frarne works in implernenting MVC | architecture. | Skills | DJANGO, JAVASCRIPT, MYSQL, PYTHON, CSS | Work Experience | Python Developer / QA Automation Tester | Accela Inc. - March 2014 - Present | * Involved In requirement gathering, analysis, design,",
+    "extracted_name": "ROBERT SMITH",
+    "extracted_experience_years": 15.5,
+    "work_experience": [
+      {
+        "title": "Python Developer / QA Automation Tester",
+        "company": "Accela Inc.",
+        "start_date": "March 2014",
+        "end_date": "Present",
+        "description": "Involved In requirement gathering, analysis, design, estirnation and testing of the assigned tasks In openstack. Implemented rally openstack benchmarking tool on the entire cloud environment. Experience in reviewing python code for running the troubleshooting testcases and bug issues, Configuring and managing openstack cormponents such as Keystone, Nova, Neutron, Glance, Swift, Heat. Written Nova, Glance, Neutron, Cinder, Keystone, Hashboard, Swift, Python client api to Integrate with existing application. Create a strategic architectural design of the platform with networking (VLANs, Firewalls, Load Balancers), Hypervisors (KYM and VMware), workflow and orchestration (Openstack APIS, Smart Cloud Orchestrator), Security (Keystone, IDAP), Inventory and monitoring, licensing, backup/restore, Understanding Python files in openstack environment and make necessary changes if needed."
+      },
+      {
+        "title": "Python Developer",
+        "company": "ABC Corp",
+        "start_date": "March 2011",
+        "end_date": "March 2014",
+        "description": "Conducted scrum meetings and generated custom dashboards. Knowledge testing tools like bugzilla and jira. Experience in using various version control systems like git, cvs, github, heroku and amazon ec2. Having knowledge on aws larnbda, auto scaling, cloud front, rds, routeS3, aws sns, sqs, ses; Extensively used python modules such as requests, urllib, urllib 2 for web crawling. Developed a fully autornated continuous integration system using git, gerrit, jenkins, mysql and custom tools developed in python and bash, The vanguard group is an arnerican registered investment advisor based in minneapolis, mn with over $5. 1 trilllon in assets under management. Create on-dernand daily and weekly reports by Invoking scripts with custom arguments and parameters to provide actionable data to the test owners."
+      }
+    ],
+    "employment_date_ranges": [
+      {
+        "start": "March 2014",
+        "end": "Present"
+      },
+      {
+        "start": "March 2011",
+        "end": "March 2014"
+      }
+    ],
+    "skills": [
+      "API",
+      "AWS",
+      "Airflow",
+      "Automation",
+      "Bash",
+      "Benchmarking",
+      "CI/CD",
+      "CSS",
+      "Django",
+      "Git",
+      "JavaScript",
+      "Jenkins",
+      "Jira",
+      "Load Balancing",
+      "MVC",
+      "MySQL",
+      "Prometheus",
+      "Python",
+      "Scrum",
+      "Security",
+      "Software Architecture",
+      "Swift",
+      "Testing",
+      "Troubleshooting"
+    ],
+    "education": "Not specified",
+    "projects": [
+      "* Implemented rally openstack benchmarking tool on the entire cloud environment",
+      "* Developed a fully autornated continuous integration system using git, gerrit, jenkins, mysql\nand custom tools developed in python and bash,\n* The vanguard group is an arnerican registered investment advisor based in minneapolis, mn\nwith over $5"
+    ],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 15.5,
+    "independent_date_ranges": [
+      {
+        "start": "2011-03",
+        "end": "2014-03",
+        "years": 3.0
+      },
+      {
+        "start": "2014-03",
+        "end": "2026-09",
+        "years": 12.5
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": []
+  },
+  {
+    "filename": "Image_22.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 5.84,
+        "prompt_len": 4840,
+        "response_snippet": "{\n  \"name\": \"Evalyn Simonis\",\n  \"phone\": \"+1 (555) 998 0340\",\n  \"experience\": [\n    {\n      \"company\": \"San Francisco, CA\",\n      \"start_date\": \"07/2014\",\n      \"end_date\": \"present\",\n      \"description\": \"Senior Python Developer\"\n    },\n    {\n      \"company\": \"Houston, TX\",\n      \"start_date\": \"11/"
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 3374,
+    "raw_text_snippet": "Evalyn Simonis | 677 Filiberto Skyway, Chicago, IL @ Phone: +1 (555) 998 0340 | EXPERIENCE SENIOR PYTHON DEVELOPER | San Francisco, CA | 07/2014 \u2014 present | \u00a2 Discusses technical and design issues with other developers, managers, users or customers whenever | necessary to achieve best solution | \u00a2 Familiarity with Tornado, Robot test framework, Continuous Integration environment (Jenkins), SDN, | network switches/routers and DevOps a plus | \u00ab Mentors and assists activities of junior developers | \u00a2 Help recruit and ",
+    "extracted_name": "Evalyn Simonis",
+    "extracted_experience_years": 21.1,
+    "work_experience": [
+      {
+        "title": "Role",
+        "company": "San Francisco, CA",
+        "start_date": "07/2014",
+        "end_date": "present",
+        "description": "Senior Python Developer"
+      },
+      {
+        "title": "Role",
+        "company": "Houston, TX",
+        "start_date": "11/2008",
+        "end_date": "06/2014",
+        "description": "Python Developer"
+      },
+      {
+        "title": "Role",
+        "company": "Los Angeles, CA",
+        "start_date": "04/2005",
+        "end_date": "08/2008",
+        "description": "Junior Python Developer"
+      }
+    ],
+    "employment_date_ranges": [
+      {
+        "start": "07/2014",
+        "end": "present"
+      },
+      {
+        "start": "11/2008",
+        "end": "06/2014"
+      },
+      {
+        "start": "04/2005",
+        "end": "08/2008"
+      }
+    ],
+    "skills": [
+      "Agile",
+      "Analytical Thinking",
+      "Automation",
+      "C++",
+      "CI/CD",
+      "Communication",
+      "Cross-platform",
+      "DevOps",
+      "Documentation",
+      "ETL",
+      "Jenkins",
+      "Linux",
+      "Python",
+      "R",
+      "Robotics",
+      "Security",
+      "Statistics",
+      "Testing"
+    ],
+    "education": "BELMONT UNIVERSITY Bachelor\u2019s Degree in Computer Science",
+    "projects": [
+      "\u00a2 Follow and improve established processes for software development life cycle with an agile approach to",
+      "delivery software",
+      "JUNIOR PYTHON DEVELOPER",
+      "\u00a2 Develops processing, archiving, and recovery procedures for systems. Provides production procedures for",
+      "\u00a2 Develop relationships with the Quant and Financial Development Teams to resolve pricing related issues"
+    ],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 21.1,
+    "independent_date_ranges": [
+      {
+        "start": "2005-04",
+        "end": "2008-08",
+        "years": 3.3
+      },
+      {
+        "start": "2008-11",
+        "end": "2014-06",
+        "years": 5.6
+      },
+      {
+        "start": "2014-07",
+        "end": "2026-09",
+        "years": 12.2
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": [
+      "HIGH_EXP: 21.1y (>20 \u2014 likely includes non-employment dates)"
+    ]
+  },
+  {
+    "filename": "Image_23.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 10.38,
+        "prompt_len": 2975,
+        "response_snippet": "{\n  \"name\": \"Python Developer\",\n  \"email\": null,\n  \"phone\": null,\n  \"skills\": [\n    {\n      \"name\": \"SQL\",\n      \"category\": \"Database Management\"\n    },\n    {\n      \"name\": \"JavaScript\",\n      \"category\": \"Frontend Development\"\n    },\n    {\n      \"name\": \"Python\",\n      \"category\": \"Backend Develop"
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 1531,
+    "raw_text_snippet": "Python Developer | CONTACT CAREER OBJECTIVE | Pittsburgh, PA Experienced Python developer with extensive Django experience | Linkedin | Github | WORK EXPERIENCE | Python Developer | EDUCATION DoorDash / September 2018 - current / Chicago IL | M.S. \u00a2 Worked on building new Angular components for the customer- | Computer Science facing web app which improved the time on page for the | University of Chicago average user by 2 minutes | Chicago, It / 2014-2016 \u00a2 Worked within an agile team and helped prioritize and scope | ",
+    "extracted_name": "Unnamed Candidate (6dfd46ec)",
+    "extracted_experience_years": 16.0,
+    "work_experience": [
+      {
+        "title": "Role",
+        "company": "DoorDash",
+        "start_date": "September 2018",
+        "end_date": "Current",
+        "description": "Experienced Python developer with extensive Django experience"
+      },
+      {
+        "title": "Role",
+        "company": "Knewton",
+        "start_date": "April 2016",
+        "end_date": "September 2018",
+        "description": "Python Developer"
+      },
+      {
+        "title": "Role",
+        "company": "University of Chicago",
+        "start_date": "2014",
+        "end_date": "2016",
+        "description": "Worked within an agile team and helped prioritize and scope feature requests"
+      },
+      {
+        "title": "Role",
+        "company": "University of Pittsburgh",
+        "start_date": "2010",
+        "end_date": "2014",
+        "description": "Python Developer"
+      }
+    ],
+    "employment_date_ranges": [
+      {
+        "start": "September 2018",
+        "end": "Current"
+      },
+      {
+        "start": "April 2016",
+        "end": "September 2018"
+      },
+      {
+        "start": "2014",
+        "end": "2016"
+      },
+      {
+        "start": "2010",
+        "end": "2014"
+      }
+    ],
+    "skills": [
+      "API",
+      "AWS",
+      "Agile",
+      "Angular",
+      "Backend",
+      "CSS",
+      "Cryptocurrency",
+      "Django",
+      "Git",
+      "GraphQL",
+      "Jasmine",
+      "JavaScript",
+      "Oracle Database",
+      "PostgreSQL",
+      "Python",
+      "REST",
+      "Redshift",
+      "Rest Apis",
+      "Rest Apls",
+      "SQL",
+      "Selenium",
+      "Testing"
+    ],
+    "education": "DoorDash / September",
+    "projects": [
+      "Cryptocurrency Price Tracker: Incorporated API calls to several applications and stored data efficiently in PostgreSQL backend"
+    ],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 16.0,
+    "independent_date_ranges": [
+      {
+        "start": "2010-09",
+        "end": "2014-09",
+        "years": 4.0
+      },
+      {
+        "start": "2014-09",
+        "end": "2016-09",
+        "years": 2.0
+      },
+      {
+        "start": "2016-04",
+        "end": "2018-09",
+        "years": 2.4
+      },
+      {
+        "start": "2018-09",
+        "end": "2026-09",
+        "years": 8.0
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": []
+  },
+  {
+    "filename": "Image_26.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 21.9,
+        "prompt_len": 5388,
+        "response_snippet": "{\n  \"name\": \"Daryl Jacobi\",\n  \"email\": \"+1(555) 426 5261\",\n  \"phone\": \"+1(555) 426 5261\",\n  \"skills\": [\n    {\n      \"name\": \"Programming Languages\",\n      \"category\": \"Programming Skills\"\n    },\n    {\n      \"name\": \"Agile Principles and Practices\",\n      \"category\": \"Programming Skills\"\n    },\n    {"
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 3923,
+    "raw_text_snippet": "DARYL JACOBI | SSE. SSS.....5050&S | 119 Skylar Landing, Phoenix, AZ + +1(555) 426 5261 | WORK EXPERIENCE | SENIOR PYTHON DEVELOPER 10/2017 - PRESENT | Phoenix, AZ | * Creation of python backend and javascript frontend components integrating with the firm\u2019s enterprise management systems | * Hands-on experience developing and maintaining innovative test automation frameworks | * Build and automate deployment APIs (REST, NETCONF, RESTCONF, etc.) for interfaces between network elements, EMS's, BSS, Data | bus, Orche",
+    "extracted_name": "Daryl Jacobi",
+    "extracted_experience_years": 20.1,
+    "work_experience": [
+      {
+        "title": "Senior Python Developer",
+        "company": "SSE. SSS.....5050&S",
+        "start_date": "10/2017",
+        "end_date": "Present",
+        "description": "Creation of python backend and javascript frontend components integrating with the firm\u2019s enterprise management systems, Hands-on experience developing and maintaining innovative test automation frameworks, Build and automate deployment APIs (REST, NETCONF, RESTCONF, etc.) for interfaces between network elements, EMS's, BSS, Data bus, Orchestration tools, and Customer Portals"
+      },
+      {
+        "title": "Python Developer",
+        "company": "San Francisco, CA",
+        "start_date": "12/2014",
+        "end_date": "04/2017",
+        "description": "Analysis: Analyze/create business requirements and translate into low level design and/or custom program, Coding: Develop model solutions in mixture of languages (primarily Python or C++) to run in Transunion batch and online environment meeting while meeting customer deadlines, Testing: Performs unit testing on developed code and volume testing, Code Deployments: Performs model code verification and deployments into target production applications while communicating status to internal stakeholders"
+      },
+      {
+        "title": "Junior Python Developer",
+        "company": "Houston, TX",
+        "start_date": "04/2009",
+        "end_date": "07/2014",
+        "description": "Fullstack experience (front, back, UI, and webservices), Good coding and scripting in python, Experience with Python, Experience developing under Linux, Good experience in core python object oriented programming, Python Text parsing/analysis and familiarity with ORM (Object Relational Mapper) libraries, Good experience with communication with devices using python such as Ports, Sockets etc., Basic understanding of front-end technologies, such as JavaScript, HTML5, CSS3 and good UI development experience"
+      }
+    ],
+    "employment_date_ranges": [
+      {
+        "start": "10/2017",
+        "end": "Present"
+      },
+      {
+        "start": "12/2014",
+        "end": "04/2017"
+      },
+      {
+        "start": "04/2009",
+        "end": "07/2014"
+      }
+    ],
+    "skills": [
+      "Agile",
+      "Agile Principles And Practices",
+      "Analytical Skills",
+      "Analytical Thinking",
+      "Angular",
+      "Automation",
+      "Backend",
+      "C++",
+      "C/C++",
+      "Communication",
+      "Data Analytics",
+      "Data Science",
+      "Database",
+      "Debugging",
+      "Design Patterns",
+      "Documentation",
+      "Extensive Software Engineering Experience",
+      "Flask",
+      "Frontend",
+      "Full Stack",
+      "HTML",
+      "Jasmine",
+      "Java",
+      "JavaScript",
+      "Linux",
+      "Machine Learning",
+      "Object-Oriented Design",
+      "Perl",
+      "Problem Solving",
+      "Programming Languages",
+      "Python",
+      "R",
+      "REST",
+      "Scripting",
+      "Testing",
+      "Verbal And Written Communication",
+      "Web Framework"
+    ],
+    "education": "Not specified",
+    "projects": [
+      "status to peers and management. Develops and maintains program",
+      "and user documentation. Collaborates within own team and cross functionally on model program solutions",
+      "Innovation: Identifies and implements quality and process improvements. Be able to take on challenges to implement new ideas",
+      "JUNIOR PYTHON DEVELOPER 04/2009",
+      "Good coding and scripting in python"
+    ],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 20.1,
+    "independent_date_ranges": [
+      {
+        "start": "2005-09",
+        "end": "2009-09",
+        "years": 4.0
+      },
+      {
+        "start": "2009-04",
+        "end": "2014-07",
+        "years": 5.2
+      },
+      {
+        "start": "2014-12",
+        "end": "2017-04",
+        "years": 2.3
+      },
+      {
+        "start": "2017-10",
+        "end": "2026-09",
+        "years": 8.9
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [
+      "EXP\u2192PROJECTS (date range): 'JUNIOR PYTHON DEVELOPER 04/2009'"
+    ],
+    "experience_flags": [
+      "HIGH_EXP: 20.1y (>20 \u2014 likely includes non-employment dates)",
+      "EDU_DATES_IN_TEXT: 1 education date(s) found (e.g. '2005 - 2009') \u2014 may be picked up by extract_work_dates()"
+    ]
+  },
+  {
+    "filename": "Image_28.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 7.45,
+        "prompt_len": 4373,
+        "response_snippet": "{\n  \"name\": \"Paul Satchell\",\n  \"email\": \"paulsatchell@gmail.com\",\n  \"phone\": \"41-656-271-6980\",\n  \"education\": [\n    {\n      \"degree\": \"B.S.\",\n      \"field\": \"Software Engineering\",\n      \"start_date\": \"2002-2008\",\n      \"end_date\": \"Ongoing\"\n    }\n  ],\n  \"certifications\": [\n    {\n      \"name\": \"PCP"
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 2909,
+    "raw_text_snippet": "Senior Python Developer | \\ 41-656-271-6980 \u00a9 paulsatchell@gmail.com \u00a9 github.io/paul.satchell 9 New York City, NY | SUMMARY SKILLS | Senior Python developer with PCPP2, Cloudera and Agile certification. Programming | Experienced with Python frameworks focused on data. Well-acquainted with | database engineering, Improving database performance, developing custom SciPy NumPy | data & cloud solutions, and server-side technology. | Django Pandas Flask | | SQL | EDUCATION Matplotlib | | JavaScript | | Bootstrap | B.S",
+    "extracted_name": "Paul Satchell",
+    "extracted_experience_years": 21.0,
+    "work_experience": [],
+    "employment_date_ranges": [],
+    "skills": [
+      "Agile",
+      "Ansible",
+      "Backend",
+      "Bootstrap",
+      "Django",
+      "Docker",
+      "Flask",
+      "Game Development",
+      "Git",
+      "Hadoop",
+      "Jasmine",
+      "JavaScript",
+      "Jenkins",
+      "Microservices",
+      "MySQL",
+      "NumPy",
+      "Pandas",
+      "Performance",
+      "PostgreSQL",
+      "Python",
+      "SQL",
+      "Scrum",
+      "Spark",
+      "Testing",
+      "pip"
+    ],
+    "education": "B.S. - Software Engineering",
+    "projects": [
+      "| break my projects into\n30 clients multiple parts so that if something goes\n* Developed various In-house pip packages with >75% test coverage to be wrong, | can quickly fix it"
+    ],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 21.0,
+    "independent_date_ranges": [
+      {
+        "start": "2002-09",
+        "end": "2008-09",
+        "years": 6.0
+      },
+      {
+        "start": "2011-09",
+        "end": "2014-09",
+        "years": 3.0
+      },
+      {
+        "start": "2014-09",
+        "end": "2018-09",
+        "years": 4.0
+      },
+      {
+        "start": "2018-09",
+        "end": "2026-09",
+        "years": 8.0
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": [
+      "HIGH_EXP: 21.0y (>20 \u2014 likely includes non-employment dates)"
+    ]
+  },
+  {
+    "filename": "Image_29.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 12.98,
+        "prompt_len": 3643,
+        "response_snippet": "{\n  \"name\": \"ROBERT SMITH\",\n  \"email\": \"linkedin.com/qwikrestume\",\n  \"phone\": null,\n  \"skills\": [\n    {\n      \"name\": \"Database\",\n      \"category\": \"Database\"\n    },\n    {\n      \"name\": \"HTML\",\n      \"category\": \"HTML\"\n    },\n    {\n      \"name\": \"Python\",\n      \"category\": \"Programming\"\n    }\n  ],\n "
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 2194,
+    "raw_text_snippet": "dr. Python Developer esearch | ROBERT SMITH Linkedin: linkedis.com/qwikrestume | Address; 1737 Marshville Road, | Alabama | Experienced Python backend developer commitied to maintaining cutting edge technical skills and | up-to-date industry knowledge. Has more than three years designing innovative applications and | achieving high client satisfaction, | Skills | Database., HTML, Python | Work Experience | Jr. Python Developer | Dell Computers - May 2015 - Present | * Managed, developed and designed a dashboard control",
+    "extracted_name": "ROBERT SMITH",
+    "extracted_experience_years": 16.0,
+    "work_experience": [
+      {
+        "title": "Python Developer",
+        "company": "ABC Corporation",
+        "start_date": "2010",
+        "end_date": "2015",
+        "description": "Wrote python scripts to parse xml documents and load the data in the database. Used pandas api to put the data as time series and tabular format for cast timestamp data manipulation and retrieval, Was involved in the environment, code installation as well as the syn implementation. Cleaned data and processed third-party spending data into maneuverable deliverables within specific formats with excel macros and python libraries. Ensured high quality data collection and maintaining the integrity of the data. Collaborated with internal teams to convert end user feedback into meaningful and improved solutions."
+      },
+      {
+        "title": "Jr. Python Developer",
+        "company": "Dell Computers",
+        "start_date": "2015",
+        "end_date": "Present",
+        "description": "Managed, developed and designed a dashboard control panel for customers and administrators using DJANGO, Oracle DB, PosigreSQL and VMWARE API calls. Installation, configuration, integration, tuning, backup, crash recovery, upgrades, patching, monitoring system performance, system and network security and troubleshooting of Linux/Unix servers. Qucried MYSQL database queries from Python using Python-MYSQL Connector and MYSQL DB package to retrieve information, Developed wrapper in Python for instantiating multi-threaded application. implemented a login module for user, registration of the products, placing the order and tracking the order. Wrote Python routines to log into the websites and fetch data for selected options. Designed email marketing campaigns and created interactive forms that saved data into database using DJANGO framework."
+      }
+    ],
+    "employment_date_ranges": [
+      {
+        "start": "2010",
+        "end": "2015"
+      },
+      {
+        "start": "2015",
+        "end": "Present"
+      }
+    ],
+    "skills": [
+      "API",
+      "Backend",
+      "Bootstrap",
+      "Database",
+      "Django",
+      "Frontend",
+      "HTML",
+      "InfluxDB",
+      "JavaScript",
+      "Linux",
+      "MySQL",
+      "Oracle Database",
+      "Pandas",
+      "Performance",
+      "Prometheus",
+      "Python",
+      "Security",
+      "Troubleshooting",
+      "jQuery"
+    ],
+    "education": "Bachelors in Computer Science - West Bengal University Of Technology",
+    "projects": [
+      "also used other technologies like jquery for javascript manipulations, bootstrap for",
+      "end html layout."
+    ],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 16.0,
+    "independent_date_ranges": [
+      {
+        "start": "2010-09",
+        "end": "2015-09",
+        "years": 5.0
+      },
+      {
+        "start": "2015-05",
+        "end": "2026-09",
+        "years": 11.3
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": []
+  },
+  {
+    "filename": "Image_39.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 20.81,
+        "prompt_len": 5388,
+        "response_snippet": "{\n  \"name\": \"Daryl Jacobi\",\n  \"email\": \"+1(555) 426 5261\",\n  \"phone\": \"+1(555) 426 5261\",\n  \"skills\": [\n    {\n      \"name\": \"Programming Languages\",\n      \"category\": \"Programming Skills\"\n    },\n    {\n      \"name\": \"Agile Principles and Practices\",\n      \"category\": \"Programming Skills\"\n    },\n    {"
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 3923,
+    "raw_text_snippet": "DARYL JACOBI | SSE. SSS.....5050&S | 119 Skylar Landing, Phoenix, AZ + +1(555) 426 5261 | WORK EXPERIENCE | SENIOR PYTHON DEVELOPER 10/2017 - PRESENT | Phoenix, AZ | * Creation of python backend and javascript frontend components integrating with the firm\u2019s enterprise management systems | * Hands-on experience developing and maintaining innovative test automation frameworks | * Build and automate deployment APIs (REST, NETCONF, RESTCONF, etc.) for interfaces between network elements, EMS's, BSS, Data | bus, Orche",
+    "extracted_name": "Daryl Jacobi",
+    "extracted_experience_years": 20.1,
+    "work_experience": [
+      {
+        "title": "Senior Python Developer",
+        "company": "SSE. SSS.....5050&S",
+        "start_date": "10/2017",
+        "end_date": "Present",
+        "description": "Creation of python backend and javascript frontend components integrating with the firm\u2019s enterprise management systems, Hands-on experience developing and maintaining innovative test automation frameworks, Build and automate deployment APIs (REST, NETCONF, RESTCONF, etc.) for interfaces between network elements, EMS's, BSS, Data bus, Orchestration tools, and Customer Portals"
+      },
+      {
+        "title": "Python Developer",
+        "company": "San Francisco, CA",
+        "start_date": "12/2014",
+        "end_date": "04/2017",
+        "description": "Analysis: Analyze/create business requirements and translate into low level design and/or custom program, Coding: Develop model solutions in mixture of languages (primarily Python or C++) to run in Transunion batch and online environment meeting while meeting customer deadlines, Testing: Performs unit testing on developed code and volume testing, Code Deployments: Performs model code verification and deployments into target production applications while communicating status to internal stakeholders"
+      },
+      {
+        "title": "Junior Python Developer",
+        "company": "Houston, TX",
+        "start_date": "04/2009",
+        "end_date": "07/2014",
+        "description": "Fullstack experience (front, back, UI, and webservices), Good coding and scripting in python, Experience with Python, Experience developing under Linux, Good experience in core python object oriented programming, Python Text parsing/analysis and familiarity with ORM (Object Relational Mapper) libraries, Good experience with communication with devices using python such as Ports, Sockets etc., Basic understanding of front-end technologies, such as JavaScript, HTML5, CSS3 and good UI development experience"
+      }
+    ],
+    "employment_date_ranges": [
+      {
+        "start": "10/2017",
+        "end": "Present"
+      },
+      {
+        "start": "12/2014",
+        "end": "04/2017"
+      },
+      {
+        "start": "04/2009",
+        "end": "07/2014"
+      }
+    ],
+    "skills": [
+      "Agile",
+      "Agile Principles And Practices",
+      "Analytical Skills",
+      "Analytical Thinking",
+      "Angular",
+      "Automation",
+      "Backend",
+      "C++",
+      "C/C++",
+      "Communication",
+      "Data Analytics",
+      "Data Science",
+      "Database",
+      "Debugging",
+      "Design Patterns",
+      "Documentation",
+      "Extensive Software Engineering Experience",
+      "Flask",
+      "Frontend",
+      "Full Stack",
+      "HTML",
+      "Jasmine",
+      "Java",
+      "JavaScript",
+      "Linux",
+      "Machine Learning",
+      "Object-Oriented Design",
+      "Perl",
+      "Problem Solving",
+      "Programming Languages",
+      "Python",
+      "R",
+      "REST",
+      "Scripting",
+      "Testing",
+      "Verbal And Written Communication",
+      "Web Framework"
+    ],
+    "education": "Not specified",
+    "projects": [
+      "status to peers and management. Develops and maintains program",
+      "and user documentation. Collaborates within own team and cross functionally on model program solutions",
+      "Innovation: Identifies and implements quality and process improvements. Be able to take on challenges to implement new ideas",
+      "JUNIOR PYTHON DEVELOPER 04/2009",
+      "Good coding and scripting in python"
+    ],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 20.1,
+    "independent_date_ranges": [
+      {
+        "start": "2005-09",
+        "end": "2009-09",
+        "years": 4.0
+      },
+      {
+        "start": "2009-04",
+        "end": "2014-07",
+        "years": 5.2
+      },
+      {
+        "start": "2014-12",
+        "end": "2017-04",
+        "years": 2.3
+      },
+      {
+        "start": "2017-10",
+        "end": "2026-09",
+        "years": 8.9
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [
+      "EXP\u2192PROJECTS (date range): 'JUNIOR PYTHON DEVELOPER 04/2009'"
+    ],
+    "experience_flags": [
+      "HIGH_EXP: 20.1y (>20 \u2014 likely includes non-employment dates)",
+      "EDU_DATES_IN_TEXT: 1 education date(s) found (e.g. '2005 - 2009') \u2014 may be picked up by extract_work_dates()"
+    ]
+  },
+  {
+    "filename": "Image_40.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 13.31,
+        "prompt_len": 4444,
+        "response_snippet": "{\n  \"name\": \"Jaleel Hermiston\",\n  \"phone\": \"+1 (555) 534 0743\",\n  \"experience\": [\n    {\n      \"job_title\": \"SENIOR PYTHON SOFTWARE ENGINEER\",\n      \"company\": \"Detroit, MI\",\n      \"start_date\": \"06/2015\",\n      \"end_date\": \"present\",\n      \"description\": \"Design and implement the next generation arc"
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 2983,
+    "raw_text_snippet": "Jaleel Hermiston | 4138 Hayes Port, San Francisco, CA @ Phone: +1 (555) 534 0743 | EXPERIENCE SENIOR PYTHON SOFTWARE ENGINEER | Detroit, MI | 06/2015 \u2014 present | \u00a2 Be part of a software development team working in collaboration with management, quality assurance | and technical publications teams | \u00a2 You will perform code reviews to the rest of the team members and will receive code reviews of your code | as well | \u00a2 Design and implement the next generation architecture of VMware's virtualization products includi",
+    "extracted_name": "Unnamed Candidate (32af072f)",
+    "extracted_experience_years": 18.6,
+    "work_experience": [
+      {
+        "title": "SENIOR PYTHON SOFTWARE ENGINEER",
+        "company": "Detroit, MI",
+        "start_date": "06/2015",
+        "end_date": "present",
+        "description": "Design and implement the next generation architecture of VMware's virtualization products including cloud computing and data centre automation. Python engineer with in depth knowledge of Python and its related technologies. Willingness to innovate, learn and share knowledge. Developing common-services to allow other developer to focus on product specific feature. Provide estimates and plan deliveries in conjunction with the R&D manager."
+      },
+      {
+        "title": "JAVA / PYTHON SOFTWARE ENGINEER, ASSOCIATE",
+        "company": "Detroit, MI",
+        "start_date": "05/2010",
+        "end_date": "05/2015",
+        "description": "Track record of working on distributed systems and service-oriented architecture with complex system interactions. Develop new applications for the eTrading desk and to support the day-to-day activities. Enterprise systems development/engineering solutions. Liaise with our technology partners across the bank to ensure successful end-to-end delivery. Proven track record of delivering quality software with small teams. Take ownership for resolution of any production issues post implementation. Ensure compliance with the SDLC process."
+      },
+      {
+        "title": "PYTHON SOFTWARE ENGINEER",
+        "company": "Los Angeles, CA",
+        "start_date": "10/2007",
+        "end_date": "02/2010",
+        "description": "Develop big data workflows (discovery, access, process, maintain). Serve as the technical subject matter expert on designing and developing high performance analytical models for balance sheet and P&L forecasting using Python. Manage and perform software releases and infrastructure changes. Is passionate about the success of others and actively provides support for their development. Be part of a small, high-performing development team. Active part in all development phases, including research, design, development, testing, CI/CD using best of breed technology. Create technical design recommendations for developing and integrating programs per written specifications."
+      }
+    ],
+    "employment_date_ranges": [
+      {
+        "start": "06/2015",
+        "end": "present"
+      },
+      {
+        "start": "05/2010",
+        "end": "05/2015"
+      },
+      {
+        "start": "10/2007",
+        "end": "02/2010"
+      }
+    ],
+    "skills": [
+      "Algorithms",
+      "Analytical Thinking",
+      "Automation",
+      "Big Data",
+      "CI/CD",
+      "Collaboration",
+      "Data Structures",
+      "Java",
+      "Performance",
+      "Python",
+      "R",
+      "REST",
+      "Software Architecture",
+      "Testing"
+    ],
+    "education": "ASHFORD UNIVERSITY Bachelor\u2019s Degree in Computer Science",
+    "projects": [],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 18.6,
+    "independent_date_ranges": [
+      {
+        "start": "2007-10",
+        "end": "2010-02",
+        "years": 2.3
+      },
+      {
+        "start": "2010-05",
+        "end": "2015-05",
+        "years": 5.0
+      },
+      {
+        "start": "2015-06",
+        "end": "2026-09",
+        "years": 11.3
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": []
+  },
+  {
+    "filename": "Image_42.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 25.27,
+        "prompt_len": 3496,
+        "response_snippet": "{\n  \"name\": \"Okwhr awxsXww ae\",\n  \"email\": null,\n  \"phone\": null,\n  \"skills\": [\n    {\n      \"name\": \"Hadoop\",\n      \"category\": \"Big Data\"\n    },\n    {\n      \"name\": \"Python\",\n      \"category\": \"Programming\"\n    },\n    {\n      \"name\": \"Django\",\n      \"category\": \"Web Development\"\n    },\n    {\n      "
+      }
+    ],
+    "pydantic_validated": false,
+    "is_degraded_fallback": true,
+    "extraction_error": null,
+    "raw_text_length": 2049,
+    "raw_text_snippet": "Hadoop / Python Developer | \u2014\u2014_--\u2014r\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u20140Okwhr\u2014awxsXww ae | Extensive experience as a Web/Application Developer and coding with analytical | programming using Python, Django, Flask and C++, Big Data /Hadoop technology, | Expertise in HDFS, MapReduce, Hive, Pig, Sqoop, HBase and Hadoop ecosystem. | Experienced on major Hadoop ecosystems projects such as Pig, Hive, HBase and | monitoring them with Cloudera Manager & Hortonworks. Expertise in writing HIVE | queries, Pig and MapReduce scripts and ",
+    "extracted_name": "Unnamed Candidate (fe67655a)",
+    "extracted_experience_years": 1.0,
+    "work_experience": [],
+    "employment_date_ranges": [],
+    "skills": [
+      "API",
+      "AWS",
+      "Analytical Thinking",
+      "Big Data",
+      "C++",
+      "Django",
+      "Documentation",
+      "Flask",
+      "Hadoop",
+      "InfluxDB",
+      "Pandas",
+      "Prometheus",
+      "Python",
+      "R",
+      "Yarn"
+    ],
+    "education": "Not specified",
+    "projects": [
+      "* Developed a custom AVRO framework capable of solving small files problem in\nHadoop and also extended pig and hive tools to work with it",
+      "* Created and maintained technical documentation for launching Hadoop clusters\nand for executing Hive queries and pig scripts,\n* Developed Sqoop scripts to handle change data capture for processing\nincremental records between new arrived and existing data in RDBMS tables"
+    ],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 1.0,
+    "independent_date_ranges": [
+      {
+        "start": "2014-09",
+        "end": "2015-09",
+        "years": 1.0
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": []
+  },
+  {
+    "filename": "Image_43.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 12.43,
+        "prompt_len": 4027,
+        "response_snippet": "{\n  \"name\": \"Lindsay Beer\",\n  \"phone\": \"+1 (555) 753 8128\",\n  \"education\": [\n    {\n      \"institution\": \"School of the Art Institute of Chicago\",\n      \"field\": \"Computer Science\",\n      \"start_date\": null,\n      \"end_date\": null\n    }\n  ],\n  \"experience\": [\n    {\n      \"company\": \"Schamberger Group"
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 2578,
+    "raw_text_snippet": "Lindsay Beer +1 (555) 753 8128 | 1735 Veta Mountains, San Francisco, CA | Experience | Senior Python Developer \u2014 Schamberger Group, Philadelphia, PA 07/2018 \u2014 Present | e Act as key point of contact and SMEs for Python open source components and libraries | \u00a2 Detailed knowledge of several Python frameworks and technologies | \u00a2 Detailed knowledge of several Open Source Libraries | e Strong development background in Python | e Experience with Cl tools (Jenkins, TeamCity) and Build tools (Conda, virtualenv, pip) | e",
+    "extracted_name": "Lindsay Beer",
+    "extracted_experience_years": 14.3,
+    "work_experience": [
+      {
+        "title": "Role",
+        "company": "Schamberger Group",
+        "start_date": "07/2018",
+        "end_date": "Present",
+        "description": "Senior Python Developer \u2014 As key point of contact and SMEs for Python open source components and libraries. Detailed knowledge of several Python frameworks and technologies. Strong development background in Python. Experience with Cl tools (Jenkins, TeamCity) and Build tools (Conda, virtualenv, pip). Having good hands on experience creating data pipelines with Apache Kafka and NoSQL databases. Proficient in Shell and PowerShell scripting. Good hands-on knowledge of performance/memory analysis with n-tier architecture applications. Experience with software source control systems(Git). Experience with software testing frameworks (similar to Selenium, Junit or DART). Agile workload management and bug tracking (similar to Jira or BitBucket)."
+      },
+      {
+        "title": "Role",
+        "company": "Kris and Sons",
+        "start_date": "05/2012",
+        "end_date": "06/2018",
+        "description": "Python Developer \u2014 Troubleshoot and support system and application problems. Exposure to tools like Informatica, Delphix. Solid experience with Python, Tableau, and SAS. SQL automation, RPA (nice to have), and VB. Python 3, pytest. RESTful web services, SQL, Docker Containers. Proficient with Git for source code management and recording design specifications. Serverless.com Framework. R experience building data pre-processing pipelines. Experience with git, nom, Angular (5.x or later). Experience doing test-driven development, functional testing and continuous integration is desirable."
+      }
+    ],
+    "employment_date_ranges": [
+      {
+        "start": "07/2018",
+        "end": "Present"
+      },
+      {
+        "start": "05/2012",
+        "end": "06/2018"
+      }
+    ],
+    "skills": [
+      "Agile",
+      "Angular",
+      "Apache",
+      "Authentication",
+      "Automation",
+      "Bash",
+      "Big Data",
+      "CI/CD",
+      "Conda",
+      "Dart",
+      "Design Patterns",
+      "DevOps",
+      "Docker",
+      "Git",
+      "JUnit",
+      "Jenkins",
+      "Jira",
+      "Kafka",
+      "Kubernetes",
+      "MongoDB",
+      "OAuth",
+      "Performance",
+      "Prometheus",
+      "Pytest",
+      "Python",
+      "R",
+      "Rest Apis",
+      "SOLID",
+      "SQL",
+      "Scripting",
+      "Selenium",
+      "Serverless",
+      "Software Architecture",
+      "Tableau",
+      "TeamCity",
+      "Testing",
+      "Troubleshooting",
+      "Visual Studio",
+      "pip"
+    ],
+    "education": "School of the Art Institute of Chicago - Computer Science",
+    "projects": [],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 14.3,
+    "independent_date_ranges": [
+      {
+        "start": "2012-05",
+        "end": "2018-06",
+        "years": 6.1
+      },
+      {
+        "start": "2018-07",
+        "end": "2026-09",
+        "years": 8.2
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": [
+      "EDU_DATES_IN_TEXT: 1 education date(s) found (e.g. '2018 \u2014 Present') \u2014 may be picked up by extract_work_dates()"
+    ]
+  },
+  {
+    "filename": "Image_48.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 3.2,
+        "prompt_len": 4218,
+        "response_snippet": "{\n  \"name\": \"paul.satchell\",\n  \"email\": \"paul.satchell@gmail.com\",\n  \"phone\": \"+1-656-271-6980\",\n  \"languages\": [\n    \"Python\"\n  ]\n}"
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 2756,
+    "raw_text_snippet": "Senior Python Developer | \\ +1-656-271-6980 \u00a9 paul.satchell@gmail.com \u00a9 github.io/paul.satchell 9 New York City, NY | SUMMARY SKILLS | Senior Python developer with PCPP2, Cloudera and Agile Programming | certification. Experienced with Python frameworks focused on : = | data. Well-acquainted with database engineering, improving | NumPy | scan | database performance, developing custom data & cloud ; | : | | solutions, and server-side technology. | EDUCATION | B.S. in Software Engineering is Data | New York Instiute of",
+    "extracted_name": "paul.satchell",
+    "extracted_experience_years": 19.0,
+    "work_experience": [],
+    "employment_date_ranges": [],
+    "skills": [
+      "Agile",
+      "Backend",
+      "Bootstrap",
+      "DevOps",
+      "Django",
+      "Game Development",
+      "Git",
+      "Hadoop",
+      "Jira",
+      "Microservices",
+      "NumPy",
+      "Performance",
+      "Python",
+      "R",
+      "Scrum",
+      "Spark",
+      "Testing",
+      "pip"
+    ],
+    "education": "B.S. in Software Engineering is Data New York Instiute of Technology 4.00 / 4.00 @",
+    "projects": [
+      "| break my projects into\n- Developed various in-house pip packages with >75% test coverage to be used multiple parts so that if something goes\nin in-house web applications wrong, | can quickly fix it",
+      "+ Implemented new features on the main website using Python, Django,\nBootstrap is Team leader\n+ Optimized the back-end microservices and lowered the service request time Good at making a statement, setting\nfrom 700ms to 150ms clear goals, influencing people, and\nkeeping them on the right track"
+    ],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 19.0,
+    "independent_date_ranges": [
+      {
+        "start": "2002-09",
+        "end": "2006-09",
+        "years": 4.0
+      },
+      {
+        "start": "2011-09",
+        "end": "2014-09",
+        "years": 3.0
+      },
+      {
+        "start": "2014-09",
+        "end": "2018-09",
+        "years": 4.0
+      },
+      {
+        "start": "2018-09",
+        "end": "2026-09",
+        "years": 8.0
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": []
+  },
+  {
+    "filename": "Image_5.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 2.69,
+        "prompt_len": 3900,
+        "response_snippet": "{\n  \"name\": \"John Smith\",\n  \"email\": \"john.smith@email.com\",\n  \"phone\": \"9 Sheffield\",\n  \"languages\": [\"English\", \"Spanish\", \"Native\"]\n  }"
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 2447,
+    "raw_text_snippet": "Python Developer - Wealth Management | @ john.smith@email.com 9 Sheffield | lam a highly skilled Python Developer with 5+ years of y A Problem-solving | experience specializing in Django, Docker, and React. | have a Identified and resolved critical production | strong background in developing web-based applications and issues, reducing errors by 30%. | working with various tech stacks, including Flask, SQL, | Kubernetes, and Git. y A Collaboration | Worked closely with cross-functional | teams to deliver high-q",
+    "extracted_name": "John Smith",
+    "extracted_experience_years": 9.0,
+    "work_experience": [],
+    "employment_date_ranges": [],
+    "skills": [
+      "Algorithms",
+      "Angular",
+      "Automation",
+      "Caching",
+      "Collaboration",
+      "Django",
+      "Docker",
+      "Flask",
+      "Git",
+      "Kubernetes",
+      "Mobile Development",
+      "Performance",
+      "Problem Solving",
+      "Python",
+      "React",
+      "SQL",
+      "Software Architecture",
+      "Testing"
+    ],
+    "education": "Bachelor of Science in Computer Science Recognized for dedication and hard work University of Leeds in organizing the University",
+    "projects": [
+      "AngularJS, leading to a 20% improvement in analytics accuracy. jurerdied Tor nading the davelopmeit ota",
+      "mobile app that received 90% positive"
+    ],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 9.0,
+    "independent_date_ranges": [
+      {
+        "start": "2012-09",
+        "end": "2016-09",
+        "years": 4.0
+      },
+      {
+        "start": "2016-09",
+        "end": "2018-09",
+        "years": 2.0
+      },
+      {
+        "start": "2019-09",
+        "end": "2022-09",
+        "years": 3.0
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": []
+  },
+  {
+    "filename": "Image_51.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 7.53,
+        "prompt_len": 4805,
+        "response_snippet": "{\n  \"name\": \"Loren Brekke\",\n  \"phone\": \"+1 (555) 570 0033\",\n  \"education\": [\n    {\n      \"institution\": \"Kent State University\",\n      \"field\": \"Computer Science\",\n      \"start_date\": \"12/2005\",\n      \"end_date\": \"09/2012\"\n    }\n  ],\n  \"experience\": [\n    {\n      \"company\": \"Capital technology\",\n   "
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 3340,
+    "raw_text_snippet": "Loren Brekke | 9873 Ignacio Corners, Boston, MA @ Phone: +1 (555) 570 0033 | EXPERIENCE PYTHON APPLICATIONS DEVELOPER | Houston, TX | 10/2015 \u2014 present | \u00a2 Help set development standards in areas of best practices, code quality, test coverage, monitoring, | logging, exception management, and others | \u00ab Become proficient in Python, and the Athena platform\u2019s NoSql OO database, graph-oriented | development model and developer toolset | \u00a2 Perform unit testing and system integration testing of the newly developed func",
+    "extracted_name": "Loren Brekke",
+    "extracted_experience_years": 20.2,
+    "work_experience": [
+      {
+        "title": "Role",
+        "company": "Capital technology",
+        "start_date": "10/2015",
+        "end_date": "present",
+        "description": "PYTHON APPLICATIONS DEVELOPER"
+      },
+      {
+        "title": "Role",
+        "company": "Capital technology",
+        "start_date": "02/2013",
+        "end_date": "08/2015",
+        "description": "PYTHON APPLICATION DEVELOPER"
+      },
+      {
+        "title": "Role",
+        "company": "Chicago, IL",
+        "start_date": "12/2005",
+        "end_date": "09/2012",
+        "description": "PYTHON"
+      }
+    ],
+    "employment_date_ranges": [
+      {
+        "start": "10/2015",
+        "end": "present"
+      },
+      {
+        "start": "02/2013",
+        "end": "08/2015"
+      },
+      {
+        "start": "12/2005",
+        "end": "09/2012"
+      }
+    ],
+    "skills": [
+      "Agile",
+      "Analytical Thinking",
+      "Caching",
+      "Communication",
+      "Documentation",
+      "Jasmine",
+      "Machine Learning",
+      "MongoDB",
+      "Prometheus",
+      "Python",
+      "React",
+      "SQL",
+      "SonarQube",
+      "Spring",
+      "Testing"
+    ],
+    "education": "Kent State University - Computer Science",
+    "projects": [
+      "scope, identify activities/ tasks, task level estimates, schedule, dependencies, risks",
+      "and provide inputs to Module Lead for review"
+    ],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 20.2,
+    "independent_date_ranges": [
+      {
+        "start": "2005-12",
+        "end": "2012-09",
+        "years": 6.8
+      },
+      {
+        "start": "2013-02",
+        "end": "2015-08",
+        "years": 2.5
+      },
+      {
+        "start": "2015-10",
+        "end": "2026-09",
+        "years": 10.9
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": [
+      "HIGH_EXP: 20.2y (>20 \u2014 likely includes non-employment dates)"
+    ]
+  },
+  {
+    "filename": "Image_54.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 7.61,
+        "prompt_len": 3779,
+        "response_snippet": "{\n  \"name\": \"Philip Higginbottom\",\n  \"email\": \"philip@philiphigginbottom.com\",\n  \"phone\": \"7777777777\",\n  \"skills\": [\n    {\n      \"name\": \"Web frameworks\",\n      \"category\": \"Code versioning tools\"\n    },\n    {\n      \"name\": \"Event-driven programming\",\n      \"category\": \"Object relational mappers\"\n "
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 2325,
+    "raw_text_snippet": "Philip Higginbottom | Python Developer | Wakefield | of. 7777777777 | & philip@philiphigginbottom.cor | Professional Profile | PCPP2 certified Python Developer with over 9 years' experience working with Python frameworks | focused on data. Well-acquainted with database engineering. improving database | performance, developing custom data and cloud solutions, and server-side technology. ay | seen Python coding and scripting, and working with web frameworks including Django, HTM! | a ' | Core Skills | * Web frameworks ",
+    "extracted_name": "Philip Higginbottom",
+    "extracted_experience_years": 7.3,
+    "work_experience": [
+      {
+        "title": "Role",
+        "company": "Digital Consultants inc",
+        "start_date": "May 2019",
+        "end_date": "Present",
+        "description": "Python Developer"
+      }
+    ],
+    "employment_date_ranges": [
+      {
+        "start": "May 2019",
+        "end": "Present"
+      }
+    ],
+    "skills": [
+      "Backend",
+      "Data Structures",
+      "Debugging",
+      "Django",
+      "Event-Driven Programming",
+      "Exception Handling",
+      "Machine Learning",
+      "Machine Learning And Al",
+      "Microservices",
+      "Performance",
+      "Python",
+      "Scripting",
+      "Security",
+      "Software Architecture",
+      "Troubleshooting",
+      "Web Frameworks"
+    ],
+    "education": "Not specified",
+    "projects": [
+      "Developed several in-house packages with over 75% test coverage",
+      "Developed and configured client database and backend applications and programs,\ncontributing to operations continuity and increasing program efficiency by 18%"
+    ],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 7.3,
+    "independent_date_ranges": [
+      {
+        "start": "2019-05",
+        "end": "2026-09",
+        "years": 7.3
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": []
+  },
+  {
+    "filename": "Image_6.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 14.99,
+        "prompt_len": 5163,
+        "response_snippet": "{\n  \"name\": \"denver\",\n  \"email\": \"denver@hiration.com\",\n  \"phone\": \"+1 (166) 1111311\",\n  \"skills\": [\n    {\n      \"name\": \"Programming\",\n      \"category\": \"Programming\"\n    },\n    {\n      \"name\": \"Application Development\",\n      \"category\": \"Coding\"\n    },\n    {\n      \"name\": \"Coding\",\n      \"categor"
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 3698,
+    "raw_text_snippet": "& +1 (166) 1111311 denver@hiration.com 9 SF,CA in veww.linkedin.com/denver | Python Developer | SUMMARY | S years experienced Python Developer & Certified Microsoft Technology Associate highly skilled in brainstorming and coding | features & enhancements. Possesses an understanding of developing end-to-end applications as per client requirements and quality | norms. Adept at conducting manual testing and performing regular audits to fix bugs & improve work efficiency. | KEY SKILLS | * Programming * Applicatio",
+    "extracted_name": "denver",
+    "extracted_experience_years": 0.0,
+    "work_experience": [
+      {
+        "title": "Role",
+        "company": "Technovation LLP",
+        "start_date": "Apr'18",
+        "end_date": "Apr '20",
+        "description": "Python Developer"
+      },
+      {
+        "title": "Role",
+        "company": "TheWorld Enterprise",
+        "start_date": "Apr'16",
+        "end_date": "Apr '18",
+        "description": "Computer Programmer"
+      },
+      {
+        "title": "Role",
+        "company": "Technical Circle Enterprise",
+        "start_date": "Apr'15",
+        "end_date": "Apr '16",
+        "description": "Back-end Intern"
+      }
+    ],
+    "employment_date_ranges": [
+      {
+        "start": "Apr'18",
+        "end": "Apr '20"
+      },
+      {
+        "start": "Apr'16",
+        "end": "Apr '18"
+      },
+      {
+        "start": "Apr'15",
+        "end": "Apr '16"
+      }
+    ],
+    "skills": [
+      "Application Development",
+      "Auditing",
+      "Automation",
+      "Backend",
+      "C++",
+      "Coding",
+      "Collaboration",
+      "Debugging",
+      "Django",
+      "Flask",
+      "Frontend",
+      "Git",
+      "HTML",
+      "Java",
+      "JavaScript",
+      "Manual Testing",
+      "Market Research",
+      "Performance",
+      "Performance Improvement",
+      "Programming",
+      "Prometheus",
+      "Python",
+      "React",
+      "Sass",
+      "Security",
+      "Testing",
+      "Testing & Troubleshooting",
+      "Testing Automation",
+      "Troubleshooting",
+      "Vue.js"
+    ],
+    "education": "Not specified",
+    "projects": [],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 0.0,
+    "independent_date_ranges": [],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": []
+  },
+  {
+    "filename": "Image_60.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 13.99,
+        "prompt_len": 4039,
+        "response_snippet": "{\n  \"name\": \"Helen Mackay\",\n  \"email\": \"helen.mackay@gmail.com\",\n  \"phone\": \"+1-271-199-8643\",\n  \"skills\": [\n    {\n      \"name\": \"Programming\",\n      \"category\": \"Junior database developer\"\n    },\n    {\n      \"name\": \"Python\",\n      \"category\": \"Associate in Programming certification\"\n    },\n    {\n "
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 2582,
+    "raw_text_snippet": "HELEN MACKAY Junior Python Developer | \\ +1-271-199-8643 helen.mackay@gmail.com github.io/helen.python | 9 Chicago, IL | SKILLS SUMMARY | Programming Junior database developer with Python Associate in Programming certification. | Python - SQL - JavaScript Knowledgeable in data fetching and organization, data visualisation, MySQL, MongoDB and | aaa ac AWS. Some knowledge ML algorithms. | Data Skills | MongoDB - MySQL - AWS - NumPy - EDUGATION | ROBE SATE AL ee teeta eee ae) B.S. in Computer Systems and Technologie",
+    "extracted_name": "Helen Mackay",
+    "extracted_experience_years": 12.0,
+    "work_experience": [
+      {
+        "title": "Role",
+        "company": "Hudson Cloud Computing",
+        "start_date": "2018",
+        "end_date": "Present",
+        "description": "Junior Python Developer"
+      },
+      {
+        "title": "Role",
+        "company": "By 365 Career Team",
+        "start_date": "2019",
+        "end_date": "Present",
+        "description": "Bootcamp with Python"
+      },
+      {
+        "title": "Role",
+        "company": "Wolf Chicago",
+        "start_date": "2017",
+        "end_date": "2018",
+        "description": "Python Database Developer Intern"
+      }
+    ],
+    "employment_date_ranges": [
+      {
+        "start": "2018",
+        "end": "Present"
+      },
+      {
+        "start": "2019",
+        "end": "Present"
+      },
+      {
+        "start": "2017",
+        "end": "2018"
+      }
+    ],
+    "skills": [
+      "AI",
+      "AWS",
+      "Algorithms",
+      "Data Science",
+      "Data Skills",
+      "Git",
+      "JavaScript",
+      "Machine Learning",
+      "MongoDB",
+      "MySQL",
+      "NumPy",
+      "Programming",
+      "Python",
+      "SQL",
+      "Scikit-learn",
+      "Security",
+      "Tableau",
+      "TensorFlow",
+      "Testing"
+    ],
+    "education": "University of Chicago - Computer Systems and Technologies; The Python Institute - Stectronics",
+    "projects": [],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 12.0,
+    "independent_date_ranges": [
+      {
+        "start": "2014-09",
+        "end": "2018-09",
+        "years": 4.0
+      },
+      {
+        "start": "2017-09",
+        "end": "2026-09",
+        "years": 9.0
+      },
+      {
+        "start": "2017-09",
+        "end": "2018-09",
+        "years": 1.0
+      },
+      {
+        "start": "2018-09",
+        "end": "2026-09",
+        "years": 8.0
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": [
+      "EDU_DATES_IN_TEXT: 1 education date(s) found (e.g. '2014 - 2018') \u2014 may be picked up by extract_work_dates()"
+    ]
+  },
+  {
+    "filename": "Image_61.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 8.37,
+        "prompt_len": 2937,
+        "response_snippet": "{\n  \"name\": \"Charles K. Sorensen\",\n  \"email\": \"MTA\",\n  \"phone\": \"ranE\",\n  \"skills\": [\n    {\n      \"name\": \"Python coding\",\n      \"category\": \"ew scripting\"\n    },\n    {\n      \"name\": \"MVC\",\n      \"category\": \"Arche\"\n    },\n    {\n      \"name\": \"SQL\",\n      \"category\": \"GEN UENG\"\n    },\n    {\n      \"n"
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 1494,
+    "raw_text_snippet": "Charles K. Sorensen, MTA | Mosewed POPP and WTAcerted Pyiten develeper wed professional serum eunaar wit = arsomal Io | Gy RSE AT NRO Seether ROO ee A ene art AC memecetny beaten the smnaneed | MatSert toot Highty aiibed im Python coding ew scripting, Denys bamewok ant 800 Perriah Merron | canruneann VWatoeta, TH 77008 | rane | Experience Parrett) | 2015-08 Python Deweloper Email | prams | Pyath Vint ra donabernemaposteen | \u00ab Handed iwerrarig tak erected baecabinenbeatabs\u2019 | auegtiae | exccees se (97) i presenti da",
+    "extracted_name": "Charles K. Sorensen",
+    "extracted_experience_years": 14.4,
+    "work_experience": [
+      {
+        "title": "Role",
+        "company": "Popp and WTAcerted Pyiten develeper",
+        "start_date": "2015-08",
+        "end_date": "Present",
+        "description": "Python Deweloper Email"
+      },
+      {
+        "title": "Role",
+        "company": "Syton",
+        "start_date": "2012-04",
+        "end_date": "Present",
+        "description": "Data Scientist"
+      }
+    ],
+    "employment_date_ranges": [
+      {
+        "start": "2015-08",
+        "end": "Present"
+      },
+      {
+        "start": "2012-04",
+        "end": "Present"
+      }
+    ],
+    "skills": [
+      "Ant",
+      "C++",
+      "Data Analysis",
+      "MVC",
+      "Python",
+      "Python Coding",
+      "SQL",
+      "Scripting"
+    ],
+    "education": "Not specified",
+    "projects": [],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 14.0,
+    "independent_date_ranges": [
+      {
+        "start": "2012-09",
+        "end": "2026-09",
+        "years": 14.0
+      },
+      {
+        "start": "2015-09",
+        "end": "2026-09",
+        "years": 11.0
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": []
+  },
+  {
+    "filename": "Image_64.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 22.98,
+        "prompt_len": 5388,
+        "response_snippet": "{\n  \"name\": \"Daryl Jacobi\",\n  \"email\": \"+1(555) 426 5261\",\n  \"phone\": \"+1(555) 426 5261\",\n  \"skills\": [\n    {\n      \"name\": \"Programming Languages\",\n      \"category\": \"Programming Skills\"\n    },\n    {\n      \"name\": \"Agile Principles and Practices\",\n      \"category\": \"Programming Skills\"\n    },\n    {"
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 3923,
+    "raw_text_snippet": "DARYL JACOBI | SSE. SSS.....5050&S | 119 Skylar Landing, Phoenix, AZ + +1(555) 426 5261 | WORK EXPERIENCE | SENIOR PYTHON DEVELOPER 10/2017 - PRESENT | Phoenix, AZ | * Creation of python backend and javascript frontend components integrating with the firm\u2019s enterprise management systems | * Hands-on experience developing and maintaining innovative test automation frameworks | * Build and automate deployment APIs (REST, NETCONF, RESTCONF, etc.) for interfaces between network elements, EMS's, BSS, Data | bus, Orche",
+    "extracted_name": "Daryl Jacobi",
+    "extracted_experience_years": 20.1,
+    "work_experience": [
+      {
+        "title": "Senior Python Developer",
+        "company": "SSE. SSS.....5050&S",
+        "start_date": "10/2017",
+        "end_date": "Present",
+        "description": "Creation of python backend and javascript frontend components integrating with the firm\u2019s enterprise management systems, Hands-on experience developing and maintaining innovative test automation frameworks, Build and automate deployment APIs (REST, NETCONF, RESTCONF, etc.) for interfaces between network elements, EMS's, BSS, Data bus, Orchestration tools, and Customer Portals"
+      },
+      {
+        "title": "Python Developer",
+        "company": "San Francisco, CA",
+        "start_date": "12/2014",
+        "end_date": "04/2017",
+        "description": "Analysis: Analyze/create business requirements and translate into low level design and/or custom program, Coding: Develop model solutions in mixture of languages (primarily Python or C++) to run in Transunion batch and online environment meeting while meeting customer deadlines, Testing: Performs unit testing on developed code and volume testing, Code Deployments: Performs model code verification and deployments into target production applications while communicating status to internal stakeholders"
+      },
+      {
+        "title": "Junior Python Developer",
+        "company": "Houston, TX",
+        "start_date": "04/2009",
+        "end_date": "07/2014",
+        "description": "Fullstack experience (front, back, UI, and webservices), Good coding and scripting in python, Experience with Python, Experience developing under Linux, Good experience in core python object oriented programming, Python Text parsing/analysis and familiarity with ORM (Object Relational Mapper) libraries, Good experience with communication with devices using python such as Ports, Sockets etc., Basic understanding of front-end technologies, such as JavaScript, HTML5, CSS3 and good UI development experience"
+      }
+    ],
+    "employment_date_ranges": [
+      {
+        "start": "10/2017",
+        "end": "Present"
+      },
+      {
+        "start": "12/2014",
+        "end": "04/2017"
+      },
+      {
+        "start": "04/2009",
+        "end": "07/2014"
+      }
+    ],
+    "skills": [
+      "Agile",
+      "Agile Principles And Practices",
+      "Analytical Skills",
+      "Analytical Thinking",
+      "Angular",
+      "Automation",
+      "Backend",
+      "C++",
+      "C/C++",
+      "Communication",
+      "Data Analytics",
+      "Data Science",
+      "Database",
+      "Debugging",
+      "Design Patterns",
+      "Documentation",
+      "Extensive Software Engineering Experience",
+      "Flask",
+      "Frontend",
+      "Full Stack",
+      "HTML",
+      "Jasmine",
+      "Java",
+      "JavaScript",
+      "Linux",
+      "Machine Learning",
+      "Object-Oriented Design",
+      "Perl",
+      "Problem Solving",
+      "Programming Languages",
+      "Python",
+      "R",
+      "REST",
+      "Scripting",
+      "Testing",
+      "Verbal And Written Communication",
+      "Web Framework"
+    ],
+    "education": "Not specified",
+    "projects": [
+      "status to peers and management. Develops and maintains program",
+      "and user documentation. Collaborates within own team and cross functionally on model program solutions",
+      "Innovation: Identifies and implements quality and process improvements. Be able to take on challenges to implement new ideas",
+      "JUNIOR PYTHON DEVELOPER 04/2009",
+      "Good coding and scripting in python"
+    ],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 20.1,
+    "independent_date_ranges": [
+      {
+        "start": "2005-09",
+        "end": "2009-09",
+        "years": 4.0
+      },
+      {
+        "start": "2009-04",
+        "end": "2014-07",
+        "years": 5.2
+      },
+      {
+        "start": "2014-12",
+        "end": "2017-04",
+        "years": 2.3
+      },
+      {
+        "start": "2017-10",
+        "end": "2026-09",
+        "years": 8.9
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [
+      "EXP\u2192PROJECTS (date range): 'JUNIOR PYTHON DEVELOPER 04/2009'"
+    ],
+    "experience_flags": [
+      "HIGH_EXP: 20.1y (>20 \u2014 likely includes non-employment dates)",
+      "EDU_DATES_IN_TEXT: 1 education date(s) found (e.g. '2005 - 2009') \u2014 may be picked up by extract_work_dates()"
+    ]
+  },
+  {
+    "filename": "Image_7.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 3.43,
+        "prompt_len": 3284,
+        "response_snippet": "{\n  \"name\": \"Nadin Friedberger\",\n  \"email\": null,\n  \"phone\": null,\n  \"skills\": [\n    {\n      \"name\": \"Programming Languages\",\n      \"category\": \"LANGUAGES\"\n    },\n    {\n      \"name\": \"Computer Skills\",\n      \"category\": \"COMPUTER SKILLS\"\n    }\n  ],\n  \"languages\": [\n    \"German\",\n    \"English\",\n    \""
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 1836,
+    "raw_text_snippet": "Nadin Friedberger | PROFILE Certified Python Developer offering 3 years of extensive experience and exceptional | analytical and critical thinking skills. The Employee of the Year Award winner with | a pro-active approach, great work ethic, and the important ability to function well in | fast-paced and deadline-driven team environments. | WORK Python Developer | EXPERIENCE LUT Digital, Inc. | Fy 06/2017 \u2014 06/2020 Q PASADENA, CA, UNITED STATES | \u00a2 Developed web application back end components and communicated wi",
+    "extracted_name": "Nadin Friedberger",
+    "extracted_experience_years": 16.7,
+    "work_experience": [],
+    "employment_date_ranges": [],
+    "skills": [
+      "Analytical Thinking",
+      "Backend",
+      "Collaboration",
+      "Communication",
+      "Computer Skills",
+      "HTML",
+      "JavaScript",
+      "Problem Solving",
+      "Programming Languages",
+      "Python",
+      "Security",
+      "Selenium"
+    ],
+    "education": "Computer Science California Institute of Technology F09/",
+    "projects": [
+      "Fy 06/2017 \u2014 06/2020 Q PASADENA, CA, UNITED STATES\n\u00a2 Developed web application back end components and communicated with\nclients to identify their needs and goals",
+      "e Worked on the improvement of data protection and security and created new\nuser information solutions"
+    ],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 16.7,
+    "independent_date_ranges": [
+      {
+        "start": "2009-09",
+        "end": "2013-05",
+        "years": 3.7
+      },
+      {
+        "start": "2013-09",
+        "end": "2026-09",
+        "years": 13.0
+      },
+      {
+        "start": "2017-06",
+        "end": "2020-06",
+        "years": 3.0
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [
+      "EXP\u2192PROJECTS (date range): 'Fy 06/2017 \u2014 06/2020 Q PASADENA, CA, UNITED STATES\n\u00a2 Developed web application back end components and communicated with'"
+    ],
+    "experience_flags": []
+  },
+  {
+    "filename": "Image_82.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 16.45,
+        "prompt_len": 3690,
+        "response_snippet": "{\n  \"name\": \"ROBERT SMITH\",\n  \"email\": \"Info@qwikresume.com\",\n  \"skills\": [\n    {\n      \"name\": \"DJANGO\",\n      \"category\": \"Programming Languages\"\n    },\n    {\n      \"name\": \"JAVASCRIPT\",\n      \"category\": \"Programming Languages\"\n    },\n    {\n      \"name\": \"MYSQL\",\n      \"category\": \"Databases\"\n   "
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 2239,
+    "raw_text_snippet": "Python Developer / QA Email: Info@qwikresurne.com | Automation Tester Website: | ROBERT SMITH acne | Alabarna, | Objective | Around 5 years total IT experience as a software engineer and Python Developer and Salesforce | Platform. Extensive experience In Python Django web frarne works in implernenting MVC | architecture. | Skills | DJANGO, JAVASCRIPT, MYSQL, PYTHON, CSS | Work Experience | Python Developer / QA Automation Tester | Accela Inc. - March 2014 - Present | * Involved In requirement gathering, analysis, design,",
+    "extracted_name": "ROBERT SMITH",
+    "extracted_experience_years": 15.5,
+    "work_experience": [
+      {
+        "title": "Python Developer / QA Automation Tester",
+        "company": "Accela Inc.",
+        "start_date": "March 2014",
+        "end_date": "Present",
+        "description": "Involved In requirement gathering, analysis, design, estirnation and testing of the assigned tasks In openstack. Implemented rally openstack benchmarking tool on the entire cloud environment. Experience in reviewing python code for running the troubleshooting testcases and bug issues, Configuring and managing openstack cormponents such as Keystone, Nova, Neutron, Glance, Swift, Heat. Written Nova, Glance, Neutron, Cinder, Keystone, Hashboard, Swift, Python client api to Integrate with existing application. Create a strategic architectural design of the platform with networking (VLANs, Firewalls, Load Balancers), Hypervisors (KYM and VMware), workflow and orchestration (Openstack APIS, Smart Cloud Orchestrator), Security (Keystone, IDAP), Inventory and monitoring, licensing, backup/restore, Understanding Python files in openstack environment and make necessary changes if needed."
+      },
+      {
+        "title": "Python Developer",
+        "company": "ABC Corp",
+        "start_date": "March 2011",
+        "end_date": "March 2014",
+        "description": "Conducted scrum meetings and generated custom dashboards. Knowledge testing tools like bugzilla and jira. Experience in using various version control systems like git, cvs, github, heroku and amazon ec2. Having knowledge on aws larnbda, auto scaling, cloud front, rds, routeS3, aws sns, sqs, ses; Extensively used python modules such as requests, urllib, urllib 2 for web crawling. Developed a fully autornated continuous integration system using git, gerrit, jenkins, mysql and custom tools developed in python and bash, The vanguard group is an arnerican registered investment advisor based in minneapolis, mn with over $5. 1 trilllon in assets under management. Create on-dernand daily and weekly reports by Invoking scripts with custom arguments and parameters to provide actionable data to the test owners."
+      }
+    ],
+    "employment_date_ranges": [
+      {
+        "start": "March 2014",
+        "end": "Present"
+      },
+      {
+        "start": "March 2011",
+        "end": "March 2014"
+      }
+    ],
+    "skills": [
+      "API",
+      "AWS",
+      "Airflow",
+      "Automation",
+      "Bash",
+      "Benchmarking",
+      "CI/CD",
+      "CSS",
+      "Django",
+      "Git",
+      "JavaScript",
+      "Jenkins",
+      "Jira",
+      "Load Balancing",
+      "MVC",
+      "MySQL",
+      "Prometheus",
+      "Python",
+      "Scrum",
+      "Security",
+      "Software Architecture",
+      "Swift",
+      "Testing",
+      "Troubleshooting"
+    ],
+    "education": "Not specified",
+    "projects": [
+      "* Implemented rally openstack benchmarking tool on the entire cloud environment",
+      "* Developed a fully autornated continuous integration system using git, gerrit, jenkins, mysql\nand custom tools developed in python and bash,\n* The vanguard group is an arnerican registered investment advisor based in minneapolis, mn\nwith over $5"
+    ],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 15.5,
+    "independent_date_ranges": [
+      {
+        "start": "2011-03",
+        "end": "2014-03",
+        "years": 3.0
+      },
+      {
+        "start": "2014-03",
+        "end": "2026-09",
+        "years": 12.5
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": []
+  },
+  {
+    "filename": "Image_87.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 5.14,
+        "prompt_len": 4090,
+        "response_snippet": "{\n  \"name\": \"Lilla O'Kon\",\n  \"phone\": \"+1 (555) 506 5218\",\n  \"experience\": [\n    {\n      \"company\": \"LEBSACK INC\",\n      \"start_date\": \"11/2018\",\n      \"end_date\": \"present\",\n      \"description\": \"Senior Python Developer\"\n    },\n    {\n      \"company\": \"BORER-HAGENES\",\n      \"start_date\": \"07/2013\",\n"
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 2637,
+    "raw_text_snippet": "Lilla O'Kon | 4303 Burt Road, Phoenix, AZ # Phone: +1 (555) 506 5218 | EXPERIENCE LEBSACK INC Los Angeles, CA | 11/2018 \u2014 present Senior Python Developer | e Experience of developing of RESTful services | e Hands on experience with testing frameworks like pytest, unittest, PyUnit | e Understanding of the relational databases and SQL | e Hands on experience with message queues processing like RabbitMQ, Kafka, SQS | \u00a2 Knowledge of the object-relational mapping | \u00a2 AppDynamics, Grid Computing, Java | e Experience deve",
+    "extracted_name": "Lilla O'Kon",
+    "extracted_experience_years": 13.0,
+    "work_experience": [
+      {
+        "title": "Role",
+        "company": "LEBSACK INC",
+        "start_date": "11/2018",
+        "end_date": "present",
+        "description": "Senior Python Developer"
+      },
+      {
+        "title": "Role",
+        "company": "BORER-HAGENES",
+        "start_date": "07/2013",
+        "end_date": "09/2018",
+        "description": "Python Developer"
+      }
+    ],
+    "employment_date_ranges": [
+      {
+        "start": "11/2018",
+        "end": "present"
+      },
+      {
+        "start": "07/2013",
+        "end": "09/2018"
+      }
+    ],
+    "skills": [
+      "Agile",
+      "Ant",
+      "Big Data",
+      "Data Science",
+      "ETL",
+      "Flask",
+      "Full Stack",
+      "Git",
+      "Gradle",
+      "Grafana",
+      "Jasmine",
+      "Java",
+      "Jenkins",
+      "Kafka",
+      "Kubernetes",
+      "Linux",
+      "Machine Learning",
+      "Maven",
+      "Microservices",
+      "MongoDB",
+      "Nginx",
+      "NumPy",
+      "Pandas",
+      "Prometheus",
+      "Pytest",
+      "Python",
+      "Repository Pattern",
+      "Rest Apis",
+      "SQL",
+      "Spark",
+      "TeamCity",
+      "Testing"
+    ],
+    "education": "OREGON STATE UNIVERSITY Bachelor's in Computer Science",
+    "projects": [],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 13.0,
+    "independent_date_ranges": [
+      {
+        "start": "2013-07",
+        "end": "2018-09",
+        "years": 5.2
+      },
+      {
+        "start": "2018-11",
+        "end": "2026-09",
+        "years": 7.8
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": []
+  },
+  {
+    "filename": "Image_9.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 10.67,
+        "prompt_len": 2732,
+        "response_snippet": "{\n  \"name\": \"Noah Boyd\",\n  \"email\": \"noah.boyd@example.com\",\n  \"phone\": \"229-828-1284\",\n  \"education\": [\n    {\n      \"degree\": \"Bachelor of Software Engineering\",\n      \"institution\": \"University of San Francisco\",\n      \"field\": \"Computer Science\",\n      \"start_date\": \"2010\",\n      \"end_date\": \"201"
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 1279,
+    "raw_text_snippet": "NOAH BOYD KK , | Python Developer | L - if \u2122 | \\ 229-828-1284 @ noah.boyd@example.com : | a \\ { | \u201co 9 San Francisco, CA \\ y | Bachelor of Software \u00a9) Sports | \u00b0 \u00b0 GPA | Fngineering | University of San Francisco 3.85 / 4.0 ces Collaboration and Teamwork | Es 2010 - 2014 9 San Francisco, CA | in /noahboyd | sf &\u00ae Photography | noahboyd | & Social Media VY @ y | & Music | @ Mentoring | o \u00b0 ens MY LIFE | <a @ Engineering Analysis PHILOSOPHY | Anyone who has ever made | anything of importance was | disciplined. | EXPERIENCE Andrew Hendrix",
+    "extracted_name": "Noah Boyd",
+    "extracted_experience_years": 16.0,
+    "work_experience": [
+      {
+        "title": "Role",
+        "company": "Makerspace",
+        "start_date": "2017",
+        "end_date": "Ongoing",
+        "description": "Python Developer and Scrum Master for a team of 9 people. Made over 800 insertions and 150 deletions to 4 central Firmware Enalish repositories in less than 3 months. Introduced a new approach to submit-render for layout and crowd French."
+      },
+      {
+        "title": "Role",
+        "company": "Morning Star",
+        "start_date": "2015",
+        "end_date": "2017",
+        "description": "Junior Python Developer. Delivering projects with 1-2 days turn around time or even within hours. Designed and implemented Boot Menu for 2 Line Display in 3 weeks."
+      },
+      {
+        "title": "Role",
+        "company": "NRG Inc",
+        "start_date": "2014",
+        "end_date": "2015",
+        "description": "Powered by C7 Ennancyv"
+      }
+    ],
+    "employment_date_ranges": [
+      {
+        "start": "2017",
+        "end": "Ongoing"
+      },
+      {
+        "start": "2015",
+        "end": "2017"
+      },
+      {
+        "start": "2014",
+        "end": "2015"
+      }
+    ],
+    "skills": [
+      "CSS",
+      "Collaboration",
+      "Django",
+      "Firmware",
+      "Git",
+      "HTML",
+      "Java",
+      "Less",
+      "Linux",
+      "Mentoring",
+      "MySQL",
+      "Python",
+      "SQL",
+      "Scrum",
+      "jQuery"
+    ],
+    "education": "Bachelor of Software Engineering - University of San Francisco - Computer Science",
+    "projects": [],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 16.0,
+    "independent_date_ranges": [
+      {
+        "start": "2010-09",
+        "end": "2014-09",
+        "years": 4.0
+      },
+      {
+        "start": "2014-09",
+        "end": "2015-09",
+        "years": 1.0
+      },
+      {
+        "start": "2015-09",
+        "end": "2017-09",
+        "years": 2.0
+      },
+      {
+        "start": "2017-09",
+        "end": "2026-09",
+        "years": 9.0
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": []
+  },
+  {
+    "filename": "Image_92.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 3.56,
+        "prompt_len": 4286,
+        "response_snippet": "{\n  \"name\": \"Paul Satchell\",\n  \"email\": \"paul.satchell@gmail.com\",\n  \"phone\": \"41-656-271-6980\",\n  \"languages\": [\n    \"Python\",\n    \"JavaScript\"\n  ]\n}"
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 2825,
+    "raw_text_snippet": "Senior Python Developer | \\ 41-656-271-6980 \u00a9 paul.satchell@gmail.com \u00a9 github.io/paul.satchell 9 New York City, NY | SUMMARY SKILLS. | Senior Python developer with PCPP2, Cloudera and Agile certification. Programming | Experienced with Python frameworks focused on data. Well-acquainted with a | database engineering, improving database performance, developing custom | Python | | SciPy | | NumPy | data & cloud solutions, and server-side technology. [Django | co [Fae [sav] | Django | Pandas | Flask | | SQL | EDUC",
+    "extracted_name": "Paul Satchell",
+    "extracted_experience_years": 17.0,
+    "work_experience": [],
+    "employment_date_ranges": [],
+    "skills": [
+      "Agile",
+      "Backend",
+      "Bootstrap",
+      "Composer",
+      "Django",
+      "Docker",
+      "Flask",
+      "Game Development",
+      "Git",
+      "Hadoop",
+      "Jasmine",
+      "JavaScript",
+      "Jenkins",
+      "Microservices",
+      "MySQL",
+      "NumPy",
+      "Pandas",
+      "Performance",
+      "PostgreSQL",
+      "Python",
+      "SQL",
+      "Scrum",
+      "Spark",
+      "Testing",
+      "pip"
+    ],
+    "education": "| Matpiotid | | JavaScript | B.S. in Software Engineering = New York Instiute of Technology \u00a38",
+    "projects": [],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 17.0,
+    "independent_date_ranges": [
+      {
+        "start": "2002-09",
+        "end": "2008-09",
+        "years": 6.0
+      },
+      {
+        "start": "2011-09",
+        "end": "2014-09",
+        "years": 3.0
+      },
+      {
+        "start": "2018-09",
+        "end": "2026-09",
+        "years": 8.0
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": []
+  },
+  {
+    "filename": "Image_93.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 11.03,
+        "prompt_len": 3969,
+        "response_snippet": "{\n  \"name\": \"Harris Forks\",\n  \"email\": null,\n  \"phone\": null,\n  \"skills\": [\n    {\n      \"name\": \"Programming Languages\",\n      \"category\": \"Programming Languages\"\n    },\n    {\n      \"name\": \"Cloud Technology\",\n      \"category\": \"Cloud Technology\"\n    },\n    {\n      \"name\": \"Version Control\",\n      \""
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 2522,
+    "raw_text_snippet": "31495 Harris Forks, San Francisco, CA | EXPERIENCE EDUCATION | LEGROS-MORAR FASHION INSTITUTE OF TECHNOLOGY | Houston, TX | Senior Python Developer 06/2019 \u2014 present Bachelor's in Computer Science | e In-depth experience with unit testing, integration testing and load | testing | e Proven success in a distributed, team-based environment | e Knowledge of both SQL (Stored procedures) and NoSQL databases SKILLS | such as MySQL, PostgreSQL, MongoDB | \u00a2 Drive adoption of Cloud technology for data processing and \u00a2 Univ",
+    "extracted_name": "Harris Forks",
+    "extracted_experience_years": 13.0,
+    "work_experience": [
+      {
+        "title": "Role",
+        "company": "LEGROS-MORAR FASHION INSTITUTE OF TECHNOLOGY",
+        "start_date": "06/2019",
+        "end_date": "Present",
+        "description": "Senior Python Developer"
+      },
+      {
+        "title": "Role",
+        "company": "HAGENES LLC",
+        "start_date": "03/2013",
+        "end_date": "12/2018",
+        "description": "Python Developer"
+      }
+    ],
+    "employment_date_ranges": [
+      {
+        "start": "06/2019",
+        "end": "Present"
+      },
+      {
+        "start": "03/2013",
+        "end": "12/2018"
+      }
+    ],
+    "skills": [
+      "Algorithms",
+      "Analytical Thinking",
+      "Ansible",
+      "Automation",
+      "Backend",
+      "CI/CD",
+      "Cloud Technology",
+      "Data Science",
+      "Database Management",
+      "Git",
+      "Jasmine",
+      "Java",
+      "Jenkins",
+      "Jira",
+      "Kafka",
+      "Machine Learning",
+      "MongoDB",
+      "Multitasking",
+      "MySQL",
+      "Networking",
+      "PostgreSQL",
+      "Programming Languages",
+      "Prometheus",
+      "Pytest",
+      "Python",
+      "Redis",
+      "SQL",
+      "Scala",
+      "Scripting",
+      "Security",
+      "Software Analysis",
+      "Terraform",
+      "Testing"
+    ],
+    "education": "Not specified",
+    "projects": [],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 13.0,
+    "independent_date_ranges": [
+      {
+        "start": "2013-03",
+        "end": "2018-12",
+        "years": 5.8
+      },
+      {
+        "start": "2019-06",
+        "end": "2026-09",
+        "years": 7.3
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": []
+  },
+  {
+    "filename": "Image_96.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 28.5,
+        "prompt_len": 4167,
+        "response_snippet": "{\n  \"name\": \"Full Stack Python Developer\",\n  \"email\": \"email@erail.com\",\n  \"phone\": \"555-555-5555\",\n  \"skills\": [\n    {\n      \"name\": \"Programming\",\n      \"category\": \"Programming: AP!\"\n    },\n    {\n      \"name\": \"Programming\",\n      \"category\": \"Programming: Django\"\n    },\n    {\n      \"name\": \"Prog"
+      }
+    ],
+    "pydantic_validated": false,
+    "is_degraded_fallback": true,
+    "extraction_error": null,
+    "raw_text_length": 2707,
+    "raw_text_snippet": "Full Stack Python Developer | 9 Seattle, WA | SUMMARY | \\ 555-555-5555 | Full Stack Python Developer with 7+ years of experience in designing, developing, and deploying | scalable and responsive web applications. Proficient in both front-end and back-end development, \u00a9 email@erail.com | working with frameworks such as Django, Flask, React, and Vuejs. Skilled in database management, | server administration, and API integration. | SKILLS | WORK EXPERIENCE | Full Stack Python Developer Programming: AP! | Company name, C",
+    "extracted_name": "Unnamed Candidate (2edcbe2f)",
+    "extracted_experience_years": 0.0,
+    "work_experience": [
+      {
+        "title": "in designing, developing, and deploying",
+        "organization": "ions. Proficient in both front",
+        "description": "in designing, developing, and deploying scalable and responsive web applications. Proficient in both front-end and back-end development, \u00a9 email@erail"
+      }
+    ],
+    "employment_date_ranges": [],
+    "skills": [
+      "API",
+      "AWS",
+      "Apache",
+      "Authentication",
+      "Authorization",
+      "Backend",
+      "Big Data",
+      "CSS",
+      "Caching",
+      "Cassandra",
+      "Django",
+      "Flask",
+      "Frontend",
+      "Full Stack",
+      "MongoDB",
+      "MySQL",
+      "Nginx",
+      "Performance",
+      "PostgreSQL",
+      "Pytest",
+      "Python",
+      "REST",
+      "React",
+      "Redis",
+      "Rest Apis",
+      "SSL",
+      "Security",
+      "SonarQube",
+      "Testing",
+      "Vue.js"
+    ],
+    "education": "Not specified",
+    "projects": [
+      "Company name, City, State BEEF IEE STE GF SL i\n* Designed and developed web applications using Django, Flask, React, and Vuejs,\nimplementing responsive design and UX principles",
+      "\u00a9 Built and maintained RESTful APIs using Django Rest Framework and Flask Restful, Programming: Django\nintegrating with external services such as payment gateways and social media BB AB GS BEB a a\nplatforms",
+      "* Developed and maintained databases using PostgreSQL, MySQL, and MongoDB, ,\nwriting optimized queries and ensuring data integrity and security",
+      "Internet: CSS\n* Implemented caching strategies using Redis and Memcached to improve MIB BG ETE AE AE",
+      "* Implemented testing strategies using tools such as Pytest and Unittest, ensuring aaa\nthat code is free of bugs and errors"
+    ],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 0.0,
+    "independent_date_ranges": [],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": []
+  },
+  {
+    "filename": "Image_99.pdf",
+    "ocr_used": true,
+    "ollama_used": true,
+    "ollama_call_count": 1,
+    "ollama_calls_detail": [
+      {
+        "call_index": 1,
+        "model": "llama3.2:3b",
+        "elapsed_s": 9.84,
+        "prompt_len": 3148,
+        "response_snippet": "{\n  \"name\": \"Christian Greens\",\n  \"email\": null,\n  \"phone\": null,\n  \"experience\": [\n    {\n      \"company\": \"Fadel-Raynor\",\n      \"start_date\": \"04/2020\",\n      \"end_date\": \"present\",\n      \"description\": \"Python Applications Developer in San Francisco, CA. Knowledge of API's, Ansible/Chef/Puppet/Ter"
+      }
+    ],
+    "pydantic_validated": true,
+    "is_degraded_fallback": false,
+    "extraction_error": null,
+    "raw_text_length": 1704,
+    "raw_text_snippet": "95574 CHRISTIAN GREENS, HOUSTON, TX | PHONE | EXPERIENCE FADEL-RAYNOR 04/2020 \u2014 present | San Francisco, CA // Python Applications Developer | \u00a2 Knowledge of API's | e Ansible/Chef/Puppet/Terraform/Cloud Formation | e Strong experience with management and deployment in Amazon AWS services | e Strong experience with scripting Python | e Experience with ELK stack | e Passionate towards new OpenSource technologies | e Elasticsearch, Cassandra, MongoDB, GraphDB, Redis | e Python, Data, SQL, AWS | e Expert in Windows OS and",
+    "extracted_name": "Unnamed Candidate (a2aa510d)",
+    "extracted_experience_years": 11.0,
+    "work_experience": [
+      {
+        "title": "Role",
+        "company": "Fadel-Raynor",
+        "start_date": "04/2020",
+        "end_date": "present",
+        "description": "Python Applications Developer in San Francisco, CA. Knowledge of API's, Ansible/Chef/Puppet/Terraform/Cloud Formation, Strong experience with management and deployment in Amazon AWS services, Strong experience with scripting Python, Experience with ELK stack, Passionate towards new OpenSource technologies, Elasticsearch, Cassandra, MongoDB, GraphDB, Redis, Python, Data, SQL, AWS, Expert in Windows OS and MS Office ecosystem, AWS Cloud environment development and deployment."
+      },
+      {
+        "title": "Role",
+        "company": "Towne-Spencer",
+        "start_date": "05/2015",
+        "end_date": "12/2019",
+        "description": "Python Application Developer in San Francisco, CA. Hands-on development experience in Python, Highly technical and passionate about SDLC tooling and processes, System administration experience on Linux and MacOS, Familiar with development tools experience working with multiple SCM systems, code review systems, issue tracking tools, build tools, test frameworks, code quality tools, CI systems, and IDEs, Experience working as a developer on a large-scale project in an agile, globally-distributed environment."
+      }
+    ],
+    "employment_date_ranges": [
+      {
+        "start": "04/2020",
+        "end": "present"
+      },
+      {
+        "start": "05/2015",
+        "end": "12/2019"
+      }
+    ],
+    "skills": [
+      "API",
+      "AWS",
+      "Agile",
+      "Ansible",
+      "Cassandra",
+      "Code Review",
+      "Data Structures",
+      "Elasticsearch",
+      "Elk Stack",
+      "Linux",
+      "MVC",
+      "MongoDB",
+      "Python",
+      "Redis",
+      "SQL",
+      "Scripting",
+      "Security",
+      "SonarQube",
+      "Terraform",
+      "Vite"
+    ],
+    "education": "KENT STATE UNIVERSITY Bachelor's in Computer Science",
+    "projects": [
+      "in an agile, globally"
+    ],
+    "certifications": [],
+    "strengths": [],
+    "independent_experience_years": 11.0,
+    "independent_date_ranges": [
+      {
+        "start": "2015-05",
+        "end": "2019-12",
+        "years": 4.6
+      },
+      {
+        "start": "2020-04",
+        "end": "2026-09",
+        "years": 6.4
+      }
+    ],
+    "strengths_in_projects": [],
+    "experience_in_projects": [],
+    "experience_flags": []
+  }
+]

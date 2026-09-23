@@ -5,7 +5,10 @@ from io import BytesIO
 from functools import lru_cache
 from pathlib import Path
 from typing import Iterable, Tuple, List, Dict, Set, Optional
-import fitz
+try:
+    import pymupdf as fitz
+except ImportError:
+    import fitz
 import numpy as np
 from PIL import Image
 import pytesseract
@@ -68,7 +71,7 @@ CANONICAL_SKILL_MAPPING: Dict[str, str] = {
     "django": "Django", "django framework": "Django",
     "flask": "Flask", "flask framework": "Flask",
     "fastapi": "FastAPI", "fast api": "FastAPI",
-    "spring": "Spring", "spring boot": "Spring", "spring framework": "Spring", "spring mvc": "Spring",
+    "spring": "Spring", "spring boot": "Spring Boot", "spring framework": "Spring Framework", "spring mvc": "Spring MVC",
     "express": "Express.js", "expressjs": "Express.js", "express.js": "Express.js",
     "node": "Node.js", "nodejs": "Node.js", "node.js": "Node.js",
     "nest": "NestJS", "nest.js": "NestJS", "nestjs": "NestJS",
@@ -594,22 +597,27 @@ def extract_jd_requirements(job_description: str) -> Tuple[list[str], list[str]]
     # Keywords that indicate preferred skills  
     preferred_keywords = ['preferred', 'nice to have', 'bonus', 'plus', 'advantageous', 'desired']
     
-    # Split JD into sections based on requirement indicators
+    # Split JD into lines/sentences and track current section state (required vs preferred)
     required_section = ""
     preferred_section = ""
     
-    # Simple sentence-based classification
-    sentences = re.split(r'[.!?]+', job_description)
+    current_mode = "required"
+    lines_and_sentences = [s.strip() for s in re.split(r'[\.\!\?\n]+', job_description) if s.strip()]
     
-    for sentence in sentences:
-        sentence_lower = sentence.lower()
-        if any(keyword in sentence_lower for keyword in required_keywords):
-            required_section += sentence + " "
-        elif any(keyword in sentence_lower for keyword in preferred_keywords):
-            preferred_section += sentence + " "
+    for item in lines_and_sentences:
+        item_lower = item.lower()
+        has_pref = any(keyword in item_lower for keyword in preferred_keywords)
+        has_req = any(keyword in item_lower for keyword in required_keywords)
+        
+        if has_pref and not has_req:
+            current_mode = "preferred"
+        elif has_req and not has_pref:
+            current_mode = "required"
+            
+        if current_mode == "preferred":
+            preferred_section += item + "\n"
         else:
-            # Default to required for skills mentioned without preference indicators
-            required_section += sentence + " "
+            required_section += item + "\n"
     
     # Extract skills from each section using enhanced extraction
     required_skills = extract_skills(required_section)
@@ -621,20 +629,23 @@ def extract_jd_requirements(job_description: str) -> Tuple[list[str], list[str]]
     
     # Check if any extracted phrases match skills via semantic similarity
     if technical_phrases:
-        embedder = _embedder()
-        jd_embedding = embedder.encode(job_description, normalize_embeddings=True, show_progress_bar=False)
-        
-        for phrase in technical_phrases:
-            phrase_embedding = embedder.encode(phrase, normalize_embeddings=True, show_progress_bar=False)
-            similarity = float(np.dot(jd_embedding, phrase_embedding))
+        try:
+            embedder = _embedder()
+            jd_embedding = embedder.encode(job_description, normalize_embeddings=True, show_progress_bar=False)
             
-            # If phrase is semantically similar to JD and not already captured
-            if similarity >= 0.85:  # High semantic similarity threshold
-                # Check if this phrase maps to any known skill via fuzzy matching
-                fuzzy_match = fuzzy_match_skill(phrase, threshold=0.80)
-                if fuzzy_match and fuzzy_match not in required_skills + preferred_skills:
-                    # Add to required if it's a strong technical match
-                    required_skills.append(fuzzy_match)
+            for phrase in technical_phrases:
+                phrase_embedding = embedder.encode(phrase, normalize_embeddings=True, show_progress_bar=False)
+                similarity = float(np.dot(jd_embedding, phrase_embedding))
+                
+                # If phrase is semantically similar to JD and not already captured
+                if similarity >= 0.85:  # High semantic similarity threshold
+                    # Check if this phrase maps to any known skill via fuzzy matching
+                    fuzzy_match = fuzzy_match_skill(phrase, threshold=0.80)
+                    if fuzzy_match and fuzzy_match not in required_skills + preferred_skills:
+                        # Add to required if it's a strong technical match
+                        required_skills.append(fuzzy_match)
+        except Exception:
+            pass
     
     # Remove duplicates (prefer preferred over required if both)
     pref_set = set(preferred_skills)
@@ -646,37 +657,47 @@ def extract_jd_requirements(job_description: str) -> Tuple[list[str], list[str]]
 def extract_work_dates(text: str) -> List[Tuple[datetime, datetime]]:
     """
     Extract work experience date ranges from resume text.
-    Returns list of (start_date, end_date) tuples. End date is None for 'Present'.
+    Returns list of (start_date, end_date) tuples.
+    Uses span tracking to avoid double counting overlapping regex matches.
     """
+    present_keywords = {'present', 'current', 'now', 'ongoing', 'on-going', 'till date', 'till now', 'to date'}
+    present_pattern = r'present|current|now|ongoing|on-going|till\s+date|till\s+now|to\s+date'
+    
     date_patterns = [
-        # Various date formats: "Jan 2020 - Dec 2021", "01/2020 - 12/2021", "2020-2021"
-        r'(\w+\s+\d{4})\s*[-–to]+\s*(\w+\s+\d{4}|present|current|now)',
-        r'(\d{1,2}/\d{4})\s*[-–to]+\s*(\d{1,2}/\d{4}|present|current|now)',
-        r'(\d{4})\s*[-–to]+\s*(\d{4}|present|current|now)',
-        # Additional formats
-        r'(\w+\s+\d{4})\s*[-–to]+\s*(\w+\s+\d{4})',
-        r'(\d{1,2}/\d{4})\s*[-–to]+\s*(\d{1,2}/\d{4})',
+        # Formats: "Jan 2020 - Dec 2021", "01/2020 - 12/2021", "2018 - Ongoing", "2018 - 9" (OCR artifact)
+        r'(\b[a-zA-Z]{3,9}\s+(?:19|20)\d{2})\s*[-–—to]+\s*([a-zA-Z]{3,9}\s+(?:19|20)\d{2}|' + present_pattern + r')',
+        r'(\b\d{1,2}/(?:19|20)\d{2})\s*[-–—to]+\s*(\d{1,2}/(?:19|20)\d{2}|' + present_pattern + r')',
+        r'(\b(?:19|20)\d{2})\s*[-–—to]+\s*((?:19|20)\d{2}|[a-zA-Z]{3,9}\s+(?:19|20)\d{2}|' + present_pattern + r'|\d{1,2}\b(?!\d))',
     ]
     
     date_ranges = []
+    matched_spans: List[Tuple[int, int]] = []
     
     for pattern in date_patterns:
         matches = re.finditer(pattern, text, re.IGNORECASE)
         for match in matches:
+            start_pos, end_pos = match.span()
+            # Check if this match overlaps with any previously captured span
+            if any(max(start_pos, s) < min(end_pos, e) for s, e in matched_spans):
+                continue
+                
             try:
                 start_str = match.group(1)
                 end_str = match.group(2)
                 
-                # Parse start date
                 start_date = date_parser.parse(start_str, fuzzy=True)
                 
-                # Parse end date
-                if end_str.lower() in ['present', 'current', 'now']:
+                if any(kw in end_str.lower().strip() for kw in present_keywords) or (end_str.isdigit() and len(end_str) <= 2):
                     end_date = datetime.now()
                 else:
-                    end_date = date_parser.parse(end_str, fuzzy=True)
+                    try:
+                        end_date = date_parser.parse(end_str, fuzzy=True)
+                    except Exception:
+                        end_date = datetime.now() if any(kw in end_str.lower() for kw in present_keywords) else start_date
                 
-                date_ranges.append((start_date, end_date))
+                if start_date <= end_date:
+                    date_ranges.append((start_date, end_date))
+                    matched_spans.append((start_pos, end_pos))
             except Exception:
                 continue
     
@@ -684,19 +705,30 @@ def extract_work_dates(text: str) -> List[Tuple[datetime, datetime]]:
 
 
 def calculate_total_experience(date_ranges: List[Tuple[datetime, datetime]]) -> float:
-    """Calculate total years of experience from date ranges."""
+    """
+    Calculate total non-overlapping years of experience from date ranges.
+    Merges overlapping intervals before computing total duration.
+    """
     if not date_ranges:
         return 0.0
     
-    total_days = 0
-    for start, end in date_ranges:
-        if end and start < end:
-            total_days += (end - start).days
-        elif start:
-            # If end is None (present), calculate from start to now
-            total_days += (datetime.now() - start).days
+    valid_ranges = sorted([(s, e) for s, e in date_ranges if s and e and s <= e], key=lambda x: x[0])
+    if not valid_ranges:
+        return 0.0
+        
+    merged_ranges = []
+    curr_start, curr_end = valid_ranges[0]
     
-    return round(total_days / 365.25, 1)  # Convert to years
+    for next_start, next_end in valid_ranges[1:]:
+        if next_start <= curr_end:
+            curr_end = max(curr_end, next_end)
+        else:
+            merged_ranges.append((curr_start, curr_end))
+            curr_start, curr_end = next_start, next_end
+    merged_ranges.append((curr_start, curr_end))
+    
+    total_days = sum((end - start).days for start, end in merged_ranges)
+    return round(total_days / 365.25, 1)
 
 
 def extract_projects(text: str) -> list[str]:
@@ -975,6 +1007,19 @@ def _embedder():
     return SentenceTransformer("all-MiniLM-L6-v2")
 
 
+def _tfidf_semantic_similarities(job_description: str, resumes: list[str]) -> list[float]:
+    """Fallback TF-IDF similarity calculation when neural embedder is offline or unreachable."""
+    try:
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        from sklearn.metrics.pairwise import cosine_similarity
+        vectorizer = TfidfVectorizer(stop_words='english')
+        tfidf_matrix = vectorizer.fit_transform([job_description, *resumes])
+        sims = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:]).flatten()
+        return [float(np.clip(s, 0, 1)) for s in sims]
+    except Exception:
+        return [0.5] * len(resumes)
+
+
 def semantic_similarities(job_description: str, resumes: Iterable[str]) -> list[float]:
     """
     Calculate semantic similarities with normalization.
@@ -985,11 +1030,12 @@ def semantic_similarities(job_description: str, resumes: Iterable[str]) -> list[
     if not texts:
         return []
     
-    embedder = _embedder()
-    vectors = embedder.encode([job_description, *texts], normalize_embeddings=True, show_progress_bar=False)
-    
-    # Calculate raw cosine similarities
-    raw_similarities = [float(np.clip(np.dot(vectors[0], vector), 0, 1)) for vector in vectors[1:]]
+    try:
+        embedder = _embedder()
+        vectors = embedder.encode([job_description, *texts], normalize_embeddings=True, show_progress_bar=False)
+        raw_similarities = [float(np.clip(np.dot(vectors[0], vector), 0, 1)) for vector in vectors[1:]]
+    except Exception:
+        raw_similarities = _tfidf_semantic_similarities(job_description, texts)
     
     # Apply normalization for better score distribution
     normalized_similarities = normalize_cosine_similarity(raw_similarities)
@@ -1525,56 +1571,60 @@ def calculate_composite_score(
     return int(round(np.clip(overall, 0, 100)))
 
 
-# Pydantic schema for Ollama-based structured resume extraction
+# Pydantic schema for single-pass Ollama structured resume extraction
+class SkillItem(BaseModel):
+    name: str
+    category: Optional[str] = None
+
+class EducationItem(BaseModel):
+    degree: Optional[str] = None
+    institution: Optional[str] = None
+    field: Optional[str] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+
+class ExperienceItem(BaseModel):
+    job_title: Optional[str] = None
+    company: Optional[str] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    description: Optional[str] = None
+
+class ProjectItem(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    technologies: List[str] = Field(default_factory=list)
+
+class CertificationItem(BaseModel):
+    name: Optional[str] = None
+    issuer: Optional[str] = None
+    date: Optional[str] = None
+
 class ResumeExtractionSchema(BaseModel):
-    """Schema for structured resume data extraction using Ollama."""
-    candidate_name: str = Field(
-        ..., 
-        description="Legal full name; use 'Unknown' if name cannot be found"
-    )
-    total_experience_years: float = Field(
-        ...,
-        description="Calculated active work experience in years derived from date ranges, e.g. 4.5"
-    )
-    is_placeholder_resume: bool = Field(
-        ...,
-        description="True if generic template text"
-    )
-    highest_education: Optional[str] = Field(
-        None,
-        description="Degree & university name"
-    )
-    primary_skills: List[str] = Field(
-        default_factory=list,
-        description="Key technical skills"
-    )
-    work_experience: List[Dict[str, str]] = Field(
-        default_factory=list,
-        description="List of work experiences with title, company, and description"
-    )
-    notable_projects: List[str] = Field(
-        default_factory=list,
-        description="List of notable project descriptions"
-    )
+    """Schema for single-pass structured resume data extraction using Ollama."""
+    name: Optional[str] = Field(None, description="Candidate legal full name from top header lines")
+    email: Optional[str] = Field(None, description="Candidate email address")
+    phone: Optional[str] = Field(None, description="Candidate phone number")
+    summary: Optional[str] = Field(None, description="Professional summary or objective")
+    skills: List[SkillItem] = Field(default_factory=list, description="Explicit technical skills listed")
+    education: List[EducationItem] = Field(default_factory=list, description="Education history")
+    experience: List[ExperienceItem] = Field(default_factory=list, description="Work experience items with start and end dates")
+    projects: List[ProjectItem] = Field(default_factory=list, description="Projects")
+    certifications: List[CertificationItem] = Field(default_factory=list, description="Certifications and licenses")
+    languages: List[str] = Field(default_factory=list, description="Languages spoken or written")
 
 
 def preprocess_resume_text(raw_text: str) -> str:
     """
     Preprocess resume text to improve name extraction by separating header information.
-    
-    This handles cases where PDF extraction combines name with address info like:
-    "609 VANNESA BRANCH, CHICAGO, IL" → "VANNESA BRANCH\n609 Chicago, IL"
     """
     lines = raw_text.split('\n')
     processed_lines = []
     
     for line in lines:
-        # Pattern: number + name + city, state format (case insensitive)
-        # Example: "609 VANNESA BRANCH, CHICAGO, IL" or "123 John Doe, New York, NY"
         match = re.match(r'^(\d+)\s+([A-Za-z][A-Za-z\s]+),\s*([A-Za-z][A-Za-z\s]+,\s*[A-Za-z]{2})$', line.strip())
         if match:
             number, name_part, location_part = match.groups()
-            # Separate name from address
             processed_lines.append(name_part.strip())
             processed_lines.append(f"{number} {location_part.strip()}")
         else:
@@ -1585,170 +1635,197 @@ def preprocess_resume_text(raw_text: str) -> str:
 
 def extract_resume_data_ollama(raw_text: str, pdf_path: str) -> Dict:
     """
-    Extract structured resume data using Ollama LLM with Pydantic schema enforcement.
-    
-    Args:
-        raw_text: Extracted text from PDF resume
-        pdf_path: Path to the PDF file for hash fallback
-        
-    Returns:
-        Dictionary containing:
-        - name: Extracted candidate name or fallback hash name
-        - requires_manual_entry: Boolean flag for manual name correction UI
-        - experience_years: Total work experience in years
-        - education: Highest education information
-        - skills: List of primary technical skills
+    Extract structured resume data using ONE Ollama LLM call with Pydantic schema enforcement.
+    Deterministic Python logic handles skill canonicalization, date duration calculation,
+    semantic matching, and ATS scoring.
     """
     try:
         import ollama
+        import json
         
-        # Preprocess text to separate header information
         preprocessed_text = preprocess_resume_text(raw_text)
+        truncated_text = preprocessed_text[:4000]
         
-        # Use balanced text length for accuracy vs speed (3000 chars)
-        truncated_text = preprocessed_text[:3000]
-        
-        # Generate the JSON schema from Pydantic model
         schema = ResumeExtractionSchema.model_json_schema()
         
-        # Call Ollama with structured output
         response = ollama.chat(
             model=settings.ollama_model,
             messages=[
                 {
                     "role": "system",
-                    "content": """You are an expert resume parser. Extract structured information from resumes accurately.
+                    "content": """You are an expert resume parser. Extract structured information explicitly present in the resume.
 
-IMPORTANT NAME EXTRACTION RULES:
-- The candidate name is typically at the very top of the resume in the header section
-- Look for patterns like "John Doe", "JANE SMITH", or similar personal names (2+ words, letters only)
-- Company names are NOT candidate names (e.g., "Johns, Batz and O'Hara" is a company)
-- Job titles are NOT candidate names (e.g., "Senior Python Developer", "Manager") 
-- Locations/addresses are NOT names (e.g., "Chicago, IL", "123 Main St")
-- The text has been preprocessed to separate names from addresses, so names should be on their own lines
-- Phone numbers, emails, and other contact info are NOT names
-- If you cannot find a clear personal name, use "Unknown"
+STRICT EXTRACTION RULES:
+- Extract ONLY information explicitly present in the resume text.
+- NEVER infer or invent facts, skills, employers, dates, degrees, or projects that are not in the text.
+- Extract employment/work experience entries whenever clearly present in the text.
+- Recognize employment date ranges even when OCR introduces minor formatting artifacts or symbols (e.g., "2018- Ongoing", "8 2018- Ongoing", "2017-Present").
+- Treat "Ongoing", "On-going", "Present", "Current", "Now", "Till date", "Till now", and "To date" as active/current employment.
+- If a year is clearly present and the employment is ongoing, return the start year and "present" (or "ongoing") as the end_date.
+- Distinguish work experience from training, courses, and certifications based on section titles and context.
+- If information is unavailable for any field, return null or an empty list.
+- Candidate full name is typically in the header lines at the top of the resume.
+- Company names, job titles, and locations/addresses are NOT candidate names.
+- Do NOT calculate total years of experience, ATS scores, or match percentages.
 
 Return valid JSON matching the provided schema."""
                 },
                 {
-                    "role": "user", 
-                    "content": f"""Extract the following information from this resume text. The text has been preprocessed to separate header information:
-
-{truncated_text}
-
-Return a JSON object with:
-- candidate_name: The person's full name from the header (first few lines). This should be a personal name like "John Doe", NOT a company, job title, or location.
-- total_experience_years: Total work experience in years  
-- is_placeholder_resume: true if this is a template/placeholder resume
-- highest_education: Degree and university if present
-- primary_skills: List of key technical skills
-- work_experience: List of work experiences, each with title, company, and description
-- notable_projects: List of notable project descriptions"""
+                    "role": "user",
+                    "content": f"Extract all structured resume data from the text below:\n\n{truncated_text}"
                 }
             ],
             format=schema,
             options={
                 "temperature": 0.0,
-                "num_predict": 750
+                "num_predict": 1000
             }
         )
         
-        # Parse the structured response
-        extracted_data = response.message.content
-        
-        # Parse JSON response
-        import json
-        parsed_data = json.loads(extracted_data)
-        
-        # Validate with Pydantic
+        extracted_data_str = response.message.content
+        parsed_data = json.loads(extracted_data_str)
         validated_data = ResumeExtractionSchema(**parsed_data)
         
-        # Handle name extraction and placeholder detection
-        candidate_name = validated_data.candidate_name
-        is_placeholder = validated_data.is_placeholder_resume
+        # 1. Candidate Name Validation & Hash Fallback
+        extracted_name = (validated_data.name or "").strip()
+        candidate_name = extracted_name
         requires_manual_entry = False
         
-        # Define common placeholder names that should be ignored
-        placeholder_names = {'first last', 'john doe', 'your name', 'candidate name', 'name here', 'unknown', 'unknown candidate', 'unknown'}
-        
-        # Additional validation: reject names that look like companies, job titles, or locations
+        placeholder_names = {'first last', 'john doe', 'jane doe', 'your name', 'candidate name', 'name here', 'unknown', 'applicant name'}
         company_indicators = {'and', '&', 'company', 'corporation', 'inc', 'llc', 'ltd', 'group', 'associates', 'partners'}
         job_title_indicators = {'developer', 'engineer', 'manager', 'director', 'analyst', 'consultant', 'specialist', 'coordinator', 'administrator'}
         location_indicators = {'st', 'ave', 'blvd', 'rd', 'lane', 'drive', 'court', 'place', 'way', 'street', 'avenue', 'road'}
         
-        # Check if extracted name looks like a company, job title, or location
         name_lower = candidate_name.lower()
-        looks_like_company = any(indicator in name_lower for indicator in company_indicators)
-        looks_like_job_title = any(indicator in name_lower for indicator in job_title_indicators)
-        looks_like_location = any(indicator in name_lower for indicator in location_indicators)
+        is_invalid_name = (
+            not candidate_name or
+            len(candidate_name) < 2 or
+            name_lower in placeholder_names or
+            any(ind in name_lower for ind in company_indicators) or
+            any(ind in name_lower for ind in job_title_indicators) or
+            any(ind in name_lower for ind in location_indicators)
+        )
         
-        # Only use hash fallback if name is clearly invalid
-        if (candidate_name.lower().strip() in placeholder_names or 
-            looks_like_company or 
-            looks_like_job_title or 
-            looks_like_location):
+        if is_invalid_name:
             file_hash = generate_file_hash(pdf_path)
             candidate_name = f"Unnamed Candidate ({file_hash})"
             requires_manual_entry = True
-        elif is_placeholder:
-            # Resume is flagged as placeholder but has a valid name - still flag for manual review
-            requires_manual_entry = True
+            
+        # 2. Python Skill Canonicalization (using 280+ mappings)
+        raw_skills = [s.name for s in validated_data.skills if s.name]
+        rule_skills = extract_skills(raw_text)
+        all_raw_skills = raw_skills + rule_skills
         
-        # Normalize skills using the existing skill normalization system
-        normalized_skills = []
-        for skill in validated_data.primary_skills:
-            normalized = normalize_skill_term(skill)
-            normalized_skills.append(normalized)
+        normalized_skills = list(dict.fromkeys([normalize_skill_term(s) for s in all_raw_skills if s]))
         
-        # Extract work experience and projects from Ollama data
-        work_experience = validated_data.work_experience if hasattr(validated_data, 'work_experience') else []
-        notable_projects = validated_data.notable_projects if hasattr(validated_data, 'notable_projects') else []
+        # 3. Python Employment Date Parsing & Duration Calculation (deduplicated & merged)
+        present_keywords = {'present', 'current', 'now', 'ongoing', 'on-going', 'till date', 'till now', 'to date'}
+        all_date_ranges: List[Tuple[datetime, datetime]] = []
         
+        # Parse dates from structured LLM experience items
+        for exp in validated_data.experience:
+            start_s = exp.start_date
+            end_s = exp.end_date
+            if start_s:
+                try:
+                    s_dt = date_parser.parse(start_s, fuzzy=True)
+                    if not end_s or any(kw in (end_s or "").lower().strip() for kw in present_keywords):
+                        e_dt = datetime.now()
+                    else:
+                        e_dt = date_parser.parse(end_s, fuzzy=True)
+                    if s_dt <= e_dt:
+                        all_date_ranges.append((s_dt, e_dt))
+                except Exception:
+                    pass
+                    
+        # Merge with dates extracted from raw text (deduplicate overlapping ranges)
+        text_dates = extract_work_dates(raw_text)
+        for t_start, t_end in text_dates:
+            already_covered = any(
+                abs((t_start - l_start).days) < 180 and abs((t_end - l_end).days) < 180
+                for l_start, l_end in all_date_ranges
+            )
+            if not already_covered:
+                all_date_ranges.append((t_start, t_end))
+        
+        total_exp_years = calculate_total_experience(all_date_ranges)
+        
+        # 4. Education Formatting
+        edu_list = []
+        for edu in validated_data.education:
+            parts = [p for p in [edu.degree, edu.institution, edu.field] if p]
+            if parts:
+                edu_list.append(" - ".join(parts))
+        highest_edu = "; ".join(edu_list) if edu_list else extract_education(raw_text)
+        
+        # 5. Work Experience & Projects Formatting
+        work_exp_list = [
+            {
+                "title": exp.job_title or "Role",
+                "company": exp.company or "",
+                "start_date": exp.start_date or "",
+                "end_date": exp.end_date or "",
+                "description": exp.description or ""
+            }
+            for exp in validated_data.experience
+        ]
+        
+        projects_list = [
+            f"{proj.name}: {proj.description}" if proj.name and proj.description else (proj.name or proj.description or "")
+            for proj in validated_data.projects
+            if proj.name or proj.description
+        ]
+        if not projects_list:
+            projects_list = extract_projects(raw_text)
+            
         return {
             "name": candidate_name,
+            "email": validated_data.email or (extract_entities(raw_text).get("emails") or [None])[0],
+            "phone": validated_data.phone or (extract_entities(raw_text).get("phones") or [None])[0],
             "requires_manual_entry": requires_manual_entry,
-            "experience_years": validated_data.total_experience_years,
-            "education": validated_data.highest_education or "Not specified",
-            "skills": sorted(set(normalized_skills)),  # Remove duplicates and sort
-            "work_experience": work_experience,
-            "notable_projects": notable_projects
+            "is_degraded_fallback": False,
+            "experience_years": total_exp_years,
+            "education": highest_edu or "Not specified",
+            "skills": sorted(normalized_skills),
+            "work_experience": work_exp_list,
+            "notable_projects": projects_list
         }
         
     except Exception as e:
-        # Graceful fallback if Ollama is unreachable or times out
-        print(f"Ollama extraction failed: {e}")
+        print(f"[DEGRADED MODE] Ollama extraction failed for {pdf_path}: {e}. Falling back to rule-based parser.")
         
-        # Fallback to hash identification
         file_hash = generate_file_hash(pdf_path)
-        
-        # Try to extract basic information using existing rule-based methods
         try:
-            # Extract skills using existing rule-based method
             skills = extract_skills(raw_text)
-            
-            # Extract education using existing method
             education = extract_education(raw_text)
-            
-            # Extract experience using existing method
             entities = extract_entities(raw_text)
-            experience_years = entities.get("experience_years", 0)
+            date_ranges = extract_work_dates(raw_text)
+            experience_years = calculate_total_experience(date_ranges)
+            name, req_manual = extract_candidate_name_production(raw_text, Path(pdf_path).name, pdf_path)
             
             return {
-                "name": f"Unnamed Candidate ({file_hash})",
-                "requires_manual_entry": True,
-                "experience_years": float(experience_years),
+                "name": name,
+                "email": (entities.get("emails") or [None])[0],
+                "phone": (entities.get("phones") or [None])[0],
+                "requires_manual_entry": req_manual,
+                "is_degraded_fallback": True,
+                "experience_years": experience_years,
                 "education": education,
-                "skills": skills
+                "skills": sorted(set([normalize_skill_term(s) for s in skills])),
+                "work_experience": extract_experience_details(raw_text),
+                "notable_projects": extract_projects(raw_text)
             }
-        except Exception as fallback_error:
-            print(f"Fallback extraction also failed: {fallback_error}")
-            
-            # Ultimate fallback with minimal data
+        except Exception as fallback_err:
+            print(f"Fallback extraction also failed: {fallback_err}")
             return {
                 "name": f"Unnamed Candidate ({file_hash})",
+                "email": None,
+                "phone": None,
                 "requires_manual_entry": True,
+                "is_degraded_fallback": True,
                 "experience_years": 0.0,
                 "education": "Not specified",
-                "skills": []
+                "skills": [],
+                "work_experience": [],
+                "notable_projects": []
             }

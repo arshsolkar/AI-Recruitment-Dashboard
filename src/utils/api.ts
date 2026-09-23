@@ -3,7 +3,7 @@ const API_BASE_URL = 'http://localhost:8000'
 export interface AnalysisResponse {
   id: string
   job_title: string | null
-  requirements: string[]
+  requirements: { required: string[]; preferred: string[]; all?: string[] } | string[]
   status: 'queued' | 'processing' | 'completed' | 'failed'
   error: string | null
   created_at: string

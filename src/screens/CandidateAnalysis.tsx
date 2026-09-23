@@ -230,9 +230,9 @@ export default function CandidateAnalysis({ candidate, onBack }: CandidateAnalys
           {candidate.filename && (
             <button
               onClick={handleViewResume}
-              className="mt-3 flex items-center gap-1.5 text-[12px] font-600 text-[#635BFF] hover:text-[#4F46E5] transition-colors"
+              className="mt-3 w-full flex justify-center items-center gap-1.5 text-[13px] font-600 text-white bg-[#635BFF] hover:bg-[#524BDE] px-4 py-2 rounded-lg transition-colors shadow-sm hover-lift"
             >
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <svg width="14" height="14" viewBox="0 0 12 12" fill="none">
                 <path d="M2 10V3a1 1 0 011-1h4.586a1 1 0 01.707.293L9.707 3.707A1 1 0 0110 4.414V10a1 1 0 01-1 1H3a1 1 0 01-1-1z" stroke="currentColor" strokeWidth="1.2" fill="none" />
                 <path d="M7 2v2.5H9.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
                 <path d="M6 5.5v3M4.5 7l1.5 1.5 1.5-1.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />

@@ -44,7 +44,7 @@ function KpiCard({
   value: number
   suffix?: string
   change?: string
-  icon: JSX.Element
+  icon: React.ReactNode
   delay?: number
 }) {
   const displayed = useCountUp(value, 900)

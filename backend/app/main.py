@@ -7,7 +7,7 @@ from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
 from openpyxl import Workbook
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.orm import Session, selectinload
 from .config import settings
 from .database import Base, engine, get_db
@@ -71,6 +71,12 @@ def swagger_docs():
 def startup() -> None:
     settings.upload_dir.mkdir(parents=True, exist_ok=True)
     Base.metadata.create_all(bind=engine)
+    # Ensure stored_filename column exists on SQLite database if table pre-existed
+    with engine.begin() as conn:
+        try:
+            conn.execute(text("ALTER TABLE candidates ADD COLUMN stored_filename VARCHAR(255)"))
+        except Exception:
+            pass
 
 
 @app.get("/health")
@@ -190,22 +196,23 @@ def download_candidate_resume(candidate_id: str, db: Session = Depends(get_db)):
     batch_dir = settings.upload_dir / candidate.analysis_id
     if not batch_dir.exists(): raise HTTPException(404, "Analysis files not found.")
     
-    # Look for the file that matches the candidate's filename
-    # Files are stored as UUID-originalfilename.pdf
-    resume_files = list(batch_dir.glob("*.pdf"))
     matching_file = None
-    for file_path in resume_files:
-        # Extract the original filename from the UUID-filename format
-        # Format: UUID-originalfilename.pdf
-        stored_filename = file_path.name
-        # Check if the original filename is at the end (after the UUID and dash)
-        if stored_filename.endswith(f"-{candidate.filename}") or stored_filename == candidate.filename:
-            matching_file = file_path
-            break
-        # Also try partial matching for edge cases
-        if candidate.filename in stored_filename:
-            matching_file = file_path
-            break
+    if candidate.stored_filename:
+        exact_file = batch_dir / candidate.stored_filename
+        if exact_file.exists():
+            matching_file = exact_file
+
+    if not matching_file:
+        # Fallback for legacy database records without stored_filename
+        resume_files = list(batch_dir.glob("*.pdf"))
+        for file_path in resume_files:
+            stored_filename = file_path.name
+            if stored_filename.endswith(f"-{candidate.filename}") or stored_filename == candidate.filename:
+                matching_file = file_path
+                break
+            if candidate.filename in stored_filename:
+                matching_file = file_path
+                break
     
     if not matching_file: raise HTTPException(404, "Resume file not found.")
     

@@ -6,7 +6,9 @@ interface SidebarProps {
   onNewAnalysis: () => void
 }
 
-const NAV_ITEMS: { id: SidebarTab; label: string; icon: JSX.Element }[] = [
+import React from 'react'
+
+const NAV_ITEMS: { id: SidebarTab; label: string; icon: React.ReactNode }[] = [
   {
     id: 'overview',
     label: 'Overview',

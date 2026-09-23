@@ -290,3 +290,9 @@ body {
 .animate-spin {
   animation: spin 1s linear infinite;
 }
+
+@keyframes progress-shine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+

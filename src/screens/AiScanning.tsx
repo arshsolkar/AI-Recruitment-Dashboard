@@ -1,288 +1,393 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { pollAnalysis, type AnalysisResponse } from '../utils/api'
 
 interface AiScanningProps {
   analysisId: string
-  onComplete: (analysis: any) => void
+  uploadedFiles: File[]
+  onComplete: (analysis: AnalysisResponse) => void
   onError: (error: string) => void
 }
 
 const STAGES = [
-  { label: 'Job description analyzed', detail: 'Extracting key requirements' },
-  { label: 'Resume text extracted', detail: 'Processing PDF documents' },
-  { label: 'Identifying candidate skills', detail: 'Running NLP skill detection' },
-  { label: 'Calculating semantic similarity', detail: 'Vector embedding comparison' },
-  { label: 'Ranking candidates', detail: 'Scoring against criteria' },
-  { label: 'Generating recruitment insights', detail: 'Building intelligence report' },
+  { id: 1, label: 'Uploading & Preparing', detail: 'Initializing processing pipeline' },
+  { id: 2, label: 'Extracting Resume Data', detail: 'Processing PDF documents' },
+  { id: 3, label: 'Analyzing Skills', detail: 'Running NLP skill detection' },
+  { id: 4, label: 'Calculating ATS Score', detail: 'Vector embedding comparison' },
+  { id: 5, label: 'Generating Insights', detail: 'Building intelligence report' },
 ]
 
-export default function AiScanning({ analysisId, onComplete, onError }: AiScanningProps) {
+export default function AiScanning({ analysisId, uploadedFiles, onComplete, onError }: AiScanningProps) {
+  const [analysis, setAnalysis] = useState<AnalysisResponse | null>(null)
+  const [elapsedSeconds, setElapsedSeconds] = useState(0)
   const [currentStage, setCurrentStage] = useState(1)
-  const [processed, setProcessed] = useState(0)
-  const [done, setDone] = useState(false)
-  const [total, setTotal] = useState(0)
+  
+  const startTimeRef = useRef<number>(Date.now())
+  
+  const status = analysis?.status || 'queued'
+  const total = analysis?.candidate_count || uploadedFiles.length || 0
+
+  useEffect(() => {
+    if (analysis?.created_at) {
+      startTimeRef.current = new Date(analysis.created_at).getTime()
+    }
+  }, [analysis?.created_at])
+
+  useEffect(() => {
+    if (status === 'completed' || status === 'failed') return
+    
+    const interval = setInterval(() => {
+      setElapsedSeconds(Math.floor((Date.now() - startTimeRef.current) / 1000))
+    }, 1000)
+    
+    return () => clearInterval(interval)
+  }, [status])
 
   useEffect(() => {
     if (!analysisId) return
 
-    // Start with simulated progress for visual feedback
-    let count = 0
-    const interval = setInterval(() => {
-      count++
-      setProcessed(count)
-      if (count >= 95) {
-        clearInterval(interval)
-      }
-    }, 80)
-
-    // Poll for real analysis status
     pollAnalysis(
       analysisId,
-      (analysis: AnalysisResponse) => {
-        setTotal(analysis.candidate_count)
-        
-        // Update stage based on status
-        if (analysis.status === 'queued') {
-          setCurrentStage(1)
-        } else if (analysis.status === 'processing') {
-          setCurrentStage(2)
-        }
-      },
+      (updated) => setAnalysis(updated),
       2000
     )
       .then((completedAnalysis) => {
-        clearInterval(interval)
-        setDone(true)
-        setProcessed(100)
+        setAnalysis(completedAnalysis)
         setTimeout(() => onComplete(completedAnalysis), 1500)
       })
-      .catch((error) => {
-        clearInterval(interval)
-        onError(error.message)
-      })
-
-    return () => clearInterval(interval)
+      .catch((error) => onError(error.message))
   }, [analysisId, onComplete, onError])
 
-  const progressPct = total > 0 ? (processed / total) * 100 : 0
+  // Progress logic
+  const expectedTotalSeconds = total * 10
+  const recentCandidates = analysis?.candidates || []
+  const completedCount = status === 'completed' ? total : recentCandidates.length
+  const progressPct = total > 0 ? (completedCount / total) * 100 : 0
+  
+  useEffect(() => {
+    if (status === 'completed') {
+      setCurrentStage(6)
+    } else if (status === 'processing') {
+      // Advance stages purely for visual feedback of the batch, NOT resume count
+      const progressRatio = Math.min(elapsedSeconds / Math.max(expectedTotalSeconds, 1), 0.95)
+      
+      if (progressRatio < 0.1) setCurrentStage(2)
+      else if (progressRatio < 0.4) setCurrentStage(3)
+      else if (progressRatio < 0.7) setCurrentStage(4)
+      else setCurrentStage(5)
+    }
+  }, [elapsedSeconds, expectedTotalSeconds, status])
+  
+  const formatTime = (secs: number) => {
+    if (isNaN(secs) || secs < 0 || !isFinite(secs)) return '--:--'
+    const m = Math.floor(secs / 60)
+    const s = Math.floor(secs % 60)
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+  }
+
+  const avgSecsPerResume = completedCount > 0 ? elapsedSeconds / completedCount : 0
+  const remainingResumes = total - completedCount
+  
+  let estimatedRemaining = '--:--'
+  if (status === 'completed') {
+    estimatedRemaining = '00:00'
+  } else if (completedCount >= 1 && avgSecsPerResume > 0) {
+    estimatedRemaining = '~' + formatTime(avgSecsPerResume * remainingResumes)
+  } else {
+    estimatedRemaining = 'Calculating...'
+  }
+  
+  const speed = completedCount > 0 ? ((completedCount / Math.max(elapsedSeconds, 1)) * 60).toFixed(1) : '...'
+
+  const currentResumeIndex = Math.min(completedCount, total - 1)
+  const currentResumeFilename = uploadedFiles[currentResumeIndex]?.name || `Resume_${currentResumeIndex + 1}.pdf`
+
+  if (status === 'failed') {
+    return (
+      <div className="min-h-screen bg-[#F7F8FA] flex items-center justify-center p-6">
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-[#E5E7EB] max-w-md w-full text-center">
+          <div className="w-16 h-16 bg-[#FEE2E2] rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Analysis Interrupted</h2>
+          <p className="text-gray-600 mb-6">{analysis?.error || 'Unable to complete resume processing.'}</p>
+          <div className="flex justify-between items-center bg-gray-50 p-4 rounded-lg mb-6 text-sm">
+            <div>
+              <div className="text-gray-500">Completed</div>
+              <div className="font-semibold">{completedCount} resumes</div>
+            </div>
+            <div>
+              <div className="text-gray-500">Remaining</div>
+              <div className="font-semibold">{remainingResumes} resumes</div>
+            </div>
+          </div>
+          <button 
+            onClick={() => onError(analysis?.error || 'Failed')}
+            className="w-full py-2.5 bg-[#635BFF] text-white rounded-lg font-medium hover:bg-[#524BDE] transition-colors"
+          >
+            Start New Analysis
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="min-h-screen bg-[#F7F8FA] flex flex-col items-center justify-center relative overflow-hidden">
-      {/* Subtle background grid */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: 'radial-gradient(circle, rgba(99,91,255,0.06) 1px, transparent 1px)',
-          backgroundSize: '32px 32px',
-        }}
-      />
+    <div className="min-h-screen bg-[#F7F8FA] flex flex-col items-center py-12 px-6 overflow-y-auto">
+      <div className="w-full max-w-5xl flex flex-col gap-6">
+        
+        {/* Header */}
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">AI Scanning</h1>
+            <p className="text-gray-500 text-sm mt-1">Analyzing resumes against the provided job description</p>
+          </div>
+          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border ${
+            status === 'completed' ? 'bg-[#ECFDF5] text-[#10B981] border-[#A7F3D0]' : 'bg-white text-[#635BFF] border-[#E0E7FF]'
+          }`}>
+            {status !== 'completed' && <div className="w-2 h-2 rounded-full bg-[#635BFF] animate-pulse" />}
+            {status === 'completed' ? 'Completed' : status === 'queued' ? 'Preparing' : 'Processing'}
+          </div>
+        </div>
 
-      {/* Ambient glow */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          width: 600,
-          height: 600,
-          background: 'radial-gradient(circle, rgba(99,91,255,0.08) 0%, transparent 70%)',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-        }}
-      />
-
-      <div className="relative z-10 flex flex-col items-center gap-12 max-w-lg w-full px-6">
-        {/* Central animation */}
-        <div className="relative w-56 h-56 flex items-center justify-center">
-          {/* Outer pulse rings */}
-          <div
-            className="absolute rounded-full border border-[#635BFF]"
-            style={{
-              width: 220, height: 220,
-              animation: 'pulse-ring 2.8s ease-out infinite',
-              opacity: 0.2,
-            }}
-          />
-          <div
-            className="absolute rounded-full border border-[#635BFF]"
-            style={{
-              width: 220, height: 220,
-              animation: 'pulse-ring 2.8s ease-out infinite 1.4s',
-              opacity: 0.15,
-            }}
-          />
-
-          {/* Rotating scanner ring */}
-          <div
-            className="absolute rounded-full"
-            style={{
-              width: 180, height: 180,
-              border: '1.5px solid transparent',
-              borderTopColor: 'rgba(99,91,255,0.5)',
-              borderRightColor: 'rgba(99,91,255,0.2)',
-              animation: 'scan-rotate 3s linear infinite',
-            }}
-          />
-          <div
-            className="absolute rounded-full"
-            style={{
-              width: 160, height: 160,
-              border: '1px solid transparent',
-              borderTopColor: 'rgba(99,91,255,0.3)',
-              borderLeftColor: 'rgba(99,91,255,0.15)',
-              animation: 'scan-rotate-reverse 5s linear infinite',
-            }}
-          />
-
-          {/* Orbiting nodes */}
-          <div className="absolute" style={{ width: '100%', height: '100%' }}>
-            <div
-              className="absolute w-3 h-3 rounded-full bg-[#635BFF] top-1/2 left-1/2 -mt-1.5 -ml-1.5"
-              style={{ animation: 'orbit-a 6s linear infinite', boxShadow: '0 0 8px rgba(99,91,255,0.6)' }}
-            />
-            <div
-              className="absolute w-2 h-2 rounded-full bg-[#8B84FF] top-1/2 left-1/2 -mt-1 -ml-1"
-              style={{ animation: 'orbit-b 9s linear infinite', boxShadow: '0 0 6px rgba(99,91,255,0.5)' }}
-            />
-            <div
-              className="absolute w-2.5 h-2.5 rounded-full top-1/2 left-1/2 -mt-[5px] -ml-[5px]"
-              style={{
-                animation: 'orbit-c 12s linear infinite',
-                background: '#10B981',
-                boxShadow: '0 0 8px rgba(16,185,129,0.5)',
-              }}
-            />
-            <div
-              className="absolute w-1.5 h-1.5 rounded-full bg-[#F59E0B] top-1/2 left-1/2 -mt-[3px] -ml-[3px]"
-              style={{ animation: 'orbit-d 7.5s linear infinite', boxShadow: '0 0 5px rgba(245,158,11,0.5)' }}
-            />
+        {/* Main Progress Card */}
+        <div className="bg-white rounded-2xl p-8 shadow-sm border border-[#E5E7EB]">
+          <div className="flex justify-between items-end mb-4">
+            <div>
+              <div className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-1">AI Analysis Progress</div>
+              <div className="text-4xl font-bold text-gray-900">{Math.round(progressPct)}%</div>
+            </div>
+            <div className="text-gray-600 font-medium">
+              {completedCount} of {total} resumes processed
+            </div>
+          </div>
+          
+          <div className="w-full bg-[#F3F4F6] rounded-full h-3 mb-8 overflow-hidden relative">
+            <div 
+              className="h-full bg-gradient-to-r from-[#635BFF] to-[#8B84FF] transition-all duration-500 ease-out relative"
+              style={{ width: `${progressPct}%` }}
+            >
+              <div className="absolute inset-0 bg-white/20" style={{ animation: 'progress-shine 2s infinite linear' }} />
+            </div>
           </div>
 
-          {/* Central node */}
-          <div
-            className="relative w-20 h-20 rounded-2xl flex items-center justify-center"
-            style={{
-              background: 'linear-gradient(135deg, #635BFF 0%, #8B84FF 100%)',
-              boxShadow: '0 0 0 8px rgba(99,91,255,0.1), 0 8px 32px rgba(99,91,255,0.35)',
-            }}
-          >
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-              <circle cx="16" cy="16" r="6" fill="white" opacity="0.9" />
-              <path d="M16 4v4M16 24v4M4 16h4M24 16h4" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
-              <path d="M7.76 7.76l2.83 2.83M21.41 21.41l2.83 2.83M7.76 24.24l2.83-2.83M21.41 10.59l2.83-2.83" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity="0.35" />
-            </svg>
-
-            {done && (
-              <div
-                className="absolute inset-0 rounded-2xl flex items-center justify-center"
-                style={{ background: 'linear-gradient(135deg, #10B981 0%, #34D399 100%)', animation: 'fade-in-scale 0.35s ease both' }}
-              >
-                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                  <path d="M6 14l6 6 10-12" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          <div className="grid grid-cols-3 gap-6 divide-x divide-[#E5E7EB]">
+            <div className="pl-0">
+              <div className="text-sm text-gray-500 mb-1">Elapsed Time</div>
+              <div className="text-xl font-semibold text-gray-900">{formatTime(elapsedSeconds)}</div>
+            </div>
+            <div className="pl-6">
+              <div className="text-sm text-gray-500 mb-1">Estimated Remaining</div>
+              <div className="text-xl font-semibold text-gray-900">{estimatedRemaining}</div>
+            </div>
+            <div className="pl-6">
+              <div className="text-sm text-gray-500 mb-1">Processing Speed</div>
+              <div className="text-xl font-semibold text-gray-900">{speed} <span className="text-sm font-normal text-gray-500">resumes/min</span></div>
+            </div>
+          </div>
+          
+          {status === 'completed' && (
+            <div className="mt-8 pt-6 border-t border-gray-100 flex justify-center animate-fade-in-up">
+              <button className="flex items-center gap-2 px-6 py-3 bg-[#635BFF] text-white rounded-xl font-medium hover:bg-[#524BDE] transition-all hover-lift">
+                View Results 
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M3.33331 8H12.6666" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M8 3.33331L12.6667 7.99998L8 12.6666" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Currently Processing */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#E5E7EB] flex flex-col">
+            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-6">Currently Processing</h2>
+            
+            {status === 'completed' ? (
+              <div className="flex-1 flex flex-col items-center justify-center text-center py-8">
+                <div className="w-16 h-16 bg-[#ECFDF5] rounded-full flex items-center justify-center mb-4">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900">All resumes processed</h3>
+                <p className="text-gray-500 text-sm mt-1">Ready for review</p>
+              </div>
+            ) : (
+              <div className="border border-[#E5E7EB] rounded-xl p-5 flex-1 relative overflow-hidden bg-gray-50/50">
+                <div className="absolute top-0 left-0 w-1 h-full bg-[#635BFF]"></div>
+                
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <div className="text-xs text-gray-500 font-medium mb-1">FILE</div>
+                    <div className="font-mono text-sm font-semibold text-gray-900 bg-white px-2 py-1 border border-gray-200 rounded inline-block">
+                      {currentResumeFilename}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mb-6">
+                  <div className="text-xs text-gray-500 font-medium mb-1">CANDIDATE</div>
+                  <div className="text-base font-medium text-gray-900">
+                    {completedCount === 0 ? 'Batch processing resumes...' : 'Extracting candidate information...'}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between items-end mb-2">
+                    <div className="text-sm font-medium text-[#635BFF]">
+                      {STAGES.find(s => s.id === currentStage)?.label || 'Processing'}
+                    </div>
+                    <div className="text-xs font-medium text-gray-500">
+                      Stage {Math.min(currentStage, 5)} of 5
+                    </div>
+                  </div>
+                  <div className="w-full bg-[#E5E7EB] rounded-full h-1.5 mb-1 overflow-hidden">
+                    <div 
+                      className="h-full bg-[#635BFF] transition-all duration-300"
+                      style={{ width: `${(Math.min(currentStage, 5) / 5) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Processing Pipeline */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#E5E7EB]">
+            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-6">Processing Pipeline</h2>
+            <div className="space-y-6 relative">
+              <div className="absolute left-2.5 top-3 bottom-4 w-px bg-[#E5E7EB]"></div>
+              
+              {STAGES.map((stage) => {
+                const isComplete = currentStage > stage.id || status === 'completed'
+                const isActive = currentStage === stage.id && status !== 'completed'
+                
+                return (
+                  <div key={stage.id} className="flex items-start gap-4 relative z-10">
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                      isComplete ? 'bg-[#10B981]' : isActive ? 'bg-white border-2 border-[#635BFF]' : 'bg-white border-2 border-[#E5E7EB]'
+                    }`}>
+                      {isComplete && (
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      )}
+                      {isActive && <div className="w-2 h-2 rounded-full bg-[#635BFF] animate-pulse"></div>}
+                    </div>
+                    
+                    <div>
+                      <h4 className={`text-sm font-medium ${isComplete || isActive ? 'text-gray-900' : 'text-gray-400'}`}>
+                        {stage.label}
+                      </h4>
+                      <p className={`text-xs mt-0.5 ${isComplete || isActive ? 'text-gray-500' : 'text-gray-400'}`}>
+                        {stage.detail}
+                      </p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom row: Queue & Completed */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Queue */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#E5E7EB] lg:col-span-1">
+            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 flex justify-between">
+              <span>Processing Queue</span>
+              <span className="text-gray-500 font-medium">{uploadedFiles.length} files</span>
+            </h2>
+            <div className="space-y-2 max-h-[240px] overflow-y-auto pr-2">
+              {uploadedFiles.map((file, idx) => {
+                const isProcessed = idx < completedCount
+                const isProcessing = idx === currentResumeIndex && status !== 'completed'
+                
+                return (
+                  <div key={idx} className={`flex items-center gap-3 p-2 rounded-lg text-sm ${
+                    isProcessing ? 'bg-[#EEF0FF] border border-[#C7D2FE]' : 'border border-transparent'
+                  }`}>
+                    {isProcessed ? (
+                      <div className="text-[#10B981] flex-shrink-0">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      </div>
+                    ) : isProcessing ? (
+                      <div className="text-[#635BFF] flex-shrink-0">
+                        <div className="w-4 h-4 border-2 border-[#635BFF] border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    ) : (
+                      <div className="w-4 h-4 rounded-full border-2 border-[#E5E7EB] flex-shrink-0"></div>
+                    )}
+                    <span className={`truncate font-mono text-xs ${
+                      isProcessing ? 'text-[#635BFF] font-semibold' : 
+                      isProcessed ? 'text-gray-600' : 'text-gray-400'
+                    }`}>
+                      {file.name}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Recently Completed */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#E5E7EB] lg:col-span-2">
+            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
+              Recently Completed
+            </h2>
+            {recentCandidates.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-[200px] text-gray-400 bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="mb-2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <p className="text-sm">Candidates will appear here as they complete</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr className="text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                      <th className="pb-3 font-medium">Candidate</th>
+                      <th className="pb-3 font-medium">Match Score</th>
+                      <th className="pb-3 font-medium">Source File</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {recentCandidates.map((c) => (
+                      <tr key={c.id} className="hover:bg-gray-50 animate-fade-in-up">
+                        <td className="py-3 font-medium text-gray-900 flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-[#10B981]/10 text-[#10B981] flex items-center justify-center flex-shrink-0">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                          </div>
+                          {c.name}
+                        </td>
+                        <td className="py-3">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#EEF0FF] text-[#635BFF]">
+                            {c.overall_score}% ATS
+                          </span>
+                        </td>
+                        <td className="py-3 font-mono text-xs text-gray-500 truncate max-w-[150px]">
+                          {c.filename}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
         </div>
 
-        {/* Status area */}
-        <div className="w-full text-center">
-          {done ? (
-            <div style={{ animation: 'fade-in-up 0.4s ease both' }}>
-              <div className="text-[22px] font-700 text-[#111827] mb-1">Analysis Complete</div>
-              <div className="text-[14px] text-[#6B7280]">Ranked {total} candidates · Loading dashboard…</div>
-            </div>
-          ) : (
-            <>
-              <div className="text-[22px] font-700 text-[#111827] mb-1">Processing Resumes</div>
-              <div className="text-[14px] text-[#6B7280]">
-                {total > 0 ? `Analyzing ${total} candidates` : 'Processing analysis'}
-              </div>
-            </>
-          )}
-
-          {/* Progress bar */}
-          <div className="mt-5 w-full bg-[#E5E7EB] rounded-full h-1.5 overflow-hidden">
-            <div
-              className="h-full rounded-full transition-all duration-150"
-              style={{
-                width: `${progressPct}%`,
-                background: done
-                  ? 'linear-gradient(90deg, #10B981, #34D399)'
-                  : 'linear-gradient(90deg, #635BFF, #8B84FF)',
-              }}
-            />
-          </div>
-          <div className="mt-1.5 text-[12px] text-[#9CA3AF] font-500">{Math.round(progressPct)}%</div>
-        </div>
-
-        {/* Processing stages */}
-        <div className="w-full bg-white rounded-xl border border-[#E5E7EB] overflow-hidden" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-          {STAGES.map((stage, idx) => {
-            const isComplete = idx < currentStage
-            const isActive = idx === currentStage
-            const isPending = idx > currentStage
-
-            return (
-              <div
-                key={idx}
-                className={`flex items-center gap-3 px-5 py-3 transition-colors duration-300 ${
-                  isActive ? 'bg-[#F7F8FF]' : ''
-                } ${idx < STAGES.length - 1 ? 'border-b border-[#F3F4F6]' : ''}`}
-              >
-                {/* Status icon */}
-                <div className="w-5 h-5 flex-shrink-0 flex items-center justify-center">
-                  {isComplete ? (
-                    <div
-                      className="w-5 h-5 rounded-full bg-[#10B981] flex items-center justify-center"
-                      style={{ animation: 'step-check 0.3s ease both' }}
-                    >
-                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                        <path d="M2 5l2.5 2.5 3.5-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </div>
-                  ) : isActive ? (
-                    <div className="relative">
-                      <div
-                        className="w-5 h-5 rounded-full border-2 border-[#635BFF] absolute"
-                        style={{ animation: 'pulse-ring 1.5s ease-out infinite', opacity: 0.4 }}
-                      />
-                      <div className="w-5 h-5 rounded-full border-2 border-[#635BFF] flex items-center justify-center relative">
-                        <div className="w-2 h-2 rounded-full bg-[#635BFF] animate-blink" />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="w-5 h-5 rounded-full border-2 border-[#E5E7EB]" />
-                  )}
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div
-                    className={`text-[13px] font-500 leading-tight ${
-                      isComplete ? 'text-[#111827]' : isActive ? 'text-[#635BFF] font-600' : 'text-[#9CA3AF]'
-                    }`}
-                  >
-                    {stage.label}
-                  </div>
-                  {(isComplete || isActive) && !isPending && (
-                    <div className="text-[11px] text-[#9CA3AF] mt-0.5">{stage.detail}</div>
-                  )}
-                </div>
-
-                {isActive && (
-                  <div className="flex items-center gap-1">
-                    <div className="w-1 h-1 rounded-full bg-[#635BFF] animate-blink" style={{ animationDelay: '0s' }} />
-                    <div className="w-1 h-1 rounded-full bg-[#635BFF] animate-blink" style={{ animationDelay: '0.2s' }} />
-                    <div className="w-1 h-1 rounded-full bg-[#635BFF] animate-blink" style={{ animationDelay: '0.4s' }} />
-                  </div>
-                )}
-
-                {isComplete && (
-                  <span className="text-[11px] text-[#10B981] font-600">Done</span>
-                )}
-              </div>
-            )
-          })}
-        </div>
       </div>
     </div>
   )

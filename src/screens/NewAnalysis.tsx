@@ -259,7 +259,7 @@ export default function NewAnalysis({ onAnalyze }: NewAnalysisProps) {
           <button
             onClick={handleAnalyze}
             disabled={!canAnalyze}
-            className={`flex items-center gap-2.5 px-8 py-3.5 rounded-xl text-[15px] font-700 text-white transition-all duration-200 ${
+            className={`flex items-center gap-2.5 px-8 py-3.5 rounded-lg text-[15px] font-700 text-white transition-all duration-200 hover-lift ${
               canAnalyze
                 ? 'hover:opacity-90 hover:shadow-lg active:scale-[0.98] cursor-pointer'
                 : 'opacity-40 cursor-not-allowed'
