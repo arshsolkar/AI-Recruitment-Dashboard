@@ -83,6 +83,11 @@ function MatchBar({ label, value, delay = 0 }: { label: string; value: number; d
 }
 
 export default function CandidateAnalysis({ candidate, onBack }: CandidateAnalysisProps) {
+  const [isResumeOpen, setIsResumeOpen] = useState(false)
+  const [resumeUrl, setResumeUrl] = useState<string | null>(null)
+  const [isLoadingResume, setIsLoadingResume] = useState(false)
+  const [resumeError, setResumeError] = useState<string | null>(null)
+
   if (!candidate) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -102,11 +107,35 @@ export default function CandidateAnalysis({ candidate, onBack }: CandidateAnalys
 
   const handleViewResume = async () => {
     if (!candidate.id) return
+    
+    // Clear old state safely just in case
+    if (resumeUrl) {
+      URL.revokeObjectURL(resumeUrl)
+      setResumeUrl(null)
+    }
+
     try {
-      const resumeUrl = await getCandidateResume(candidate.id)
-      window.open(resumeUrl, '_blank')
+      setIsLoadingResume(true)
+      setResumeError(null)
+      setIsResumeOpen(true) // Open immediately to show loading state
+
+      const blob = await getCandidateResume(candidate.id)
+      const freshUrl = URL.createObjectURL(blob)
+      setResumeUrl(freshUrl)
     } catch (error) {
       console.error('Failed to open resume:', error)
+      setResumeError('Failed to load resume. Please try again.')
+    } finally {
+      setIsLoadingResume(false)
+    }
+  }
+
+  const handleCloseResume = () => {
+    setIsResumeOpen(false)
+    setResumeError(null)
+    if (resumeUrl) {
+      URL.revokeObjectURL(resumeUrl)
+      setResumeUrl(null)
     }
   }
 
@@ -242,6 +271,63 @@ export default function CandidateAnalysis({ candidate, onBack }: CandidateAnalys
           )}
         </div>
       </div>
+
+      {/* Resume Viewer Modal */}
+      {isResumeOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl h-full max-h-[90vh] flex flex-col overflow-hidden animate-scale-up">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#F3F4F6] bg-[#F7F8FA]">
+              <div>
+                <h3 className="text-[16px] font-700 text-[#111827]">{candidate.name}'s Resume</h3>
+                <p className="text-[12px] text-[#6B7280]">{candidate.filename}</p>
+              </div>
+              <button
+                onClick={handleCloseResume}
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-[#6B7280] hover:text-[#111827] hover:bg-white border border-transparent hover:border-[#E5E7EB] transition-all shadow-sm"
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="flex-1 w-full bg-[#F3F4F6] relative">
+              {isLoadingResume && !resumeUrl && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <div className="w-8 h-8 border-3 border-[#635BFF] border-t-transparent rounded-full animate-spin mb-3"></div>
+                  <div className="text-[13px] font-500 text-[#6B7280]">Loading resume...</div>
+                </div>
+              )}
+              
+              {resumeError && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <div className="w-12 h-12 bg-[#FEF2F2] text-[#EF4444] rounded-full flex items-center justify-center mb-3">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                  <div className="text-[14px] font-600 text-[#111827] mb-1">Error Loading Resume</div>
+                  <div className="text-[13px] text-[#6B7280] mb-4">{resumeError}</div>
+                  <button
+                    onClick={handleViewResume}
+                    className="px-4 py-2 bg-white border border-[#E5E7EB] text-[#374151] text-[13px] font-500 rounded-lg hover:bg-[#F9FAFB] transition-colors"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              )}
+
+              {resumeUrl && (
+                <iframe
+                  src={resumeUrl}
+                  className="w-full h-full border-0"
+                  title={`${candidate.name} Resume`}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main 3-column layout */}
       <div className="grid grid-cols-3 gap-5 mb-5">

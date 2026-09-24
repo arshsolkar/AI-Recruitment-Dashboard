@@ -462,6 +462,29 @@ def extract_pdf_text(path: str) -> str:
         sanitized_ocr = sanitize_pdf_text(ocr_combined)
         return normalize_text(sanitized_ocr)
 
+def extract_jd_pdf_text(path: str) -> str:
+    """Extract text from Job Description PDF with OCR fallback, without resume-specific sanitization."""
+    with fitz.open(path) as document:
+        raw_text = "\n".join(page.get_text("text") for page in document)
+        
+        normalized_text = normalize_text(raw_text)
+        
+        if len(normalized_text) >= 40:
+            return normalized_text
+
+        # Fallback to OCR for scanned JD PDFs
+        if settings.tesseract_cmd:
+            pytesseract.pytesseract.tesseract_cmd = settings.tesseract_cmd
+        scale = max(settings.ocr_dpi / 72, 1)
+        ocr_text: list[str] = []
+        for page in document:
+            pixmap = page.get_pixmap(matrix=fitz.Matrix(scale, scale), alpha=False)
+            image = Image.open(BytesIO(pixmap.tobytes("png")))
+            ocr_text.append(pytesseract.image_to_string(image, config="--psm 6"))
+        
+        ocr_combined = "\n".join(ocr_text)
+        return normalize_text(ocr_combined)
+
 
 def normalize_skill_term(term: str) -> str:
     """
@@ -657,9 +680,18 @@ def extract_jd_requirements(job_description: str) -> Tuple[list[str], list[str]]
 def extract_work_dates(text: str) -> List[Tuple[datetime, datetime]]:
     """
     Extract work experience date ranges from resume text.
+    First isolates the Experience section to avoid capturing Education or Project dates.
     Returns list of (start_date, end_date) tuples.
-    Uses span tracking to avoid double counting overlapping regex matches.
     """
+    # Isolate experience section
+    section_pattern = r'(?:experience|employment|work history)[:\s\n]+(.*?)(?=\n\s*(?:education|academic|skills|projects|certifications|contact|$))'
+    match = re.search(section_pattern, text, re.I | re.DOTALL)
+    if match:
+        search_text = match.group(1)
+    else:
+        # Fallback to searching the whole text, but this is riskier.
+        search_text = text
+
     present_keywords = {'present', 'current', 'now', 'ongoing', 'on-going', 'till date', 'till now', 'to date'}
     present_pattern = r'present|current|now|ongoing|on-going|till\s+date|till\s+now|to\s+date'
     
@@ -674,7 +706,7 @@ def extract_work_dates(text: str) -> List[Tuple[datetime, datetime]]:
     matched_spans: List[Tuple[int, int]] = []
     
     for pattern in date_patterns:
-        matches = re.finditer(pattern, text, re.IGNORECASE)
+        matches = re.finditer(pattern, search_text, re.IGNORECASE)
         for match in matches:
             start_pos, end_pos = match.span()
             # Check if this match overlaps with any previously captured span
@@ -761,17 +793,8 @@ def extract_projects(text: str) -> list[str]:
                             if line and line not in projects:
                                 projects.append(line)
     
-    # If no structured projects found, look for project-like sentences
-    if not projects:
-        # Look for sentences with project-related keywords
-        project_keywords = ['developed', 'built', 'created', 'designed', 'implemented', 'launched', 'deployed', 'engineered', 'architected']
-        sentences = re.split(r'[.!?]+', text)
-        for sentence in sentences:
-            sentence = sentence.strip()
-            if any(keyword in sentence.lower() for keyword in project_keywords):
-                if len(sentence) > 20 and len(sentence) < 300:
-                    if sentence not in projects:
-                        projects.append(sentence)
+    # If no structured projects found, do not invent them from random sentences.
+    # The previous fallback created severe noise by grabbing any sentence with "developed".
     
     return projects[:5]  # Return top 5 projects
 
@@ -1738,15 +1761,8 @@ Return valid JSON matching the provided schema."""
                 except Exception:
                     pass
                     
-        # Merge with dates extracted from raw text (deduplicate overlapping ranges)
-        text_dates = extract_work_dates(raw_text)
-        for t_start, t_end in text_dates:
-            already_covered = any(
-                abs((t_start - l_start).days) < 180 and abs((t_end - l_end).days) < 180
-                for l_start, l_end in all_date_ranges
-            )
-            if not already_covered:
-                all_date_ranges.append((t_start, t_end))
+        # Do NOT merge with dates extracted from raw text to prevent capturing education/project dates.
+        # Use structured LLM data exclusively if available.
         
         total_exp_years = calculate_total_experience(all_date_ranges)
         

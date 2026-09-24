@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session, selectinload
 from .config import settings
 from .database import Base, engine, get_db
 from .models import Analysis, Candidate
-from .schemas import AnalysisOut, CandidateOut
+from .schemas import AnalysisOut, CandidateOut, AnalysisStatusOut, CompletedResumeOut, CurrentResumeState, JobDescriptionExtractOut
 from .services import analyse_job
 
 app = FastAPI(title="RecruitAI API", version="1.0.0", docs_url=None)
@@ -77,6 +77,21 @@ def startup() -> None:
             conn.execute(text("ALTER TABLE candidates ADD COLUMN stored_filename VARCHAR(255)"))
         except Exception:
             pass
+        
+        for column, type_ in [
+            ("total_resumes", "INTEGER DEFAULT 0"),
+            ("current_phase", "VARCHAR(50)"),
+            ("current_stage", "VARCHAR(50) DEFAULT 'preparing'"),
+            ("current_resume_filename", "VARCHAR(255)"),
+            ("current_resume_candidate_name", "VARCHAR(255)"),
+            ("current_resume_started_at", "DATETIME"),
+            ("phase_completed", "INTEGER DEFAULT 0"),
+            ("phase_total", "INTEGER DEFAULT 0"),
+        ]:
+            try:
+                conn.execute(text(f"ALTER TABLE analyses ADD COLUMN {column} {type_}"))
+            except Exception:
+                pass
 
 
 @app.get("/health")
@@ -104,7 +119,12 @@ async def create_analysis(
     if invalid := [upload.filename or "unnamed" for upload in resumes if not (upload.filename or "").lower().endswith(".pdf")]:
         raise HTTPException(422, f"Only PDF resumes are accepted: {', '.join(invalid)}")
 
-    analysis = Analysis(job_title=job_title, job_description=job_description, status="queued")
+    analysis = Analysis(
+        job_title=job_title, 
+        job_description=job_description, 
+        status="queued",
+        total_resumes=len(resumes)
+    )
     db.add(analysis)
     db.commit(); db.refresh(analysis)
     batch_dir = settings.upload_dir / analysis.id
@@ -157,6 +177,47 @@ def get_analysis(analysis_id: str, db: Session = Depends(get_db)):
     analysis = db.scalar(select(Analysis).options(selectinload(Analysis.candidates)).where(Analysis.id == analysis_id))
     if not analysis: raise HTTPException(404, "Analysis not found.")
     return to_analysis_out(analysis)
+
+
+@app.get("/api/v1/analyses/{analysis_id}/status", response_model=AnalysisStatusOut)
+def get_analysis_status(analysis_id: str, db: Session = Depends(get_db)):
+    analysis = db.scalar(select(Analysis).options(selectinload(Analysis.candidates)).where(Analysis.id == analysis_id))
+    if not analysis: raise HTTPException(404, "Analysis not found.")
+    
+    completed = len(analysis.candidates)
+    
+    completed_resumes = [
+        CompletedResumeOut(
+            id=c.id,
+            filename=c.filename,
+            candidate_name=c.name,
+            ats_score=c.overall_score
+        )
+        for c in analysis.candidates
+    ]
+    
+    current_resume = None
+    if analysis.current_resume_filename:
+        current_resume = CurrentResumeState(
+            filename=analysis.current_resume_filename,
+            candidate_name=analysis.current_resume_candidate_name
+        )
+        
+    return AnalysisStatusOut(
+        analysis_id=analysis.id,
+        status=analysis.status,
+        phase=analysis.current_phase,
+        current_stage=analysis.current_stage,
+        total=analysis.total_resumes,
+        completed=completed,
+        phase_completed=analysis.phase_completed,
+        phase_total=analysis.phase_total,
+        current_resume=current_resume,
+        completed_resumes=completed_resumes,
+        started_at=analysis.created_at,
+        current_resume_started_at=analysis.current_resume_started_at,
+        completed_at=analysis.completed_at
+    )
 
 
 @app.get("/api/v1/analyses/{analysis_id}/report.xlsx")
@@ -222,3 +283,49 @@ def download_candidate_resume(candidate_id: str, db: Session = Depends(get_db)):
         filename=candidate.filename,
         headers={"Content-Disposition": f'inline; filename="{candidate.filename}"'}
     )
+
+
+@app.post("/api/v1/job-descriptions/extract", response_model=JobDescriptionExtractOut)
+async def extract_job_description(file: UploadFile = File(...)):
+    if not (file.filename or "").lower().endswith(".pdf"):
+        raise HTTPException(422, "Only PDF files are supported.")
+    
+    # Save to a temporary file
+    temp_dir = settings.upload_dir / "temp_jd"
+    temp_dir.mkdir(parents=True, exist_ok=True)
+    temp_path = temp_dir / f"{uuid.uuid4()}-{file.filename}"
+    
+    try:
+        written = 0
+        signature = bytearray()
+        with temp_path.open("wb") as output:
+            while chunk := await file.read(1024 * 1024):
+                written += len(chunk)
+                if len(signature) < 5:
+                    signature.extend(chunk[: 5 - len(signature)])
+                if written > settings.max_file_size_bytes:
+                    raise HTTPException(413, "File exceeds the size limit.")
+                output.write(chunk)
+        if not bytes(signature).startswith(b"%PDF-"):
+            raise HTTPException(422, "Unable to read the PDF.")
+        
+        # We need pages to return in schema.
+        import fitz
+        pages = 0
+        with fitz.open(temp_path) as doc:
+            pages = len(doc)
+
+        from app.nlp import extract_jd_pdf_text
+        text = extract_jd_pdf_text(str(temp_path))
+        
+        # Validation
+        if not text or len(text) < 50 or not any(c.isalpha() for c in text):
+            raise HTTPException(422, "No readable job description text was found in this PDF.")
+            
+        return JobDescriptionExtractOut(text=text, filename=file.filename or "jd.pdf", pages=pages)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(422, "Unable to read the PDF.")
+    finally:
+        temp_path.unlink(missing_ok=True)

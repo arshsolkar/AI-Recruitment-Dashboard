@@ -429,6 +429,43 @@ def run_tests():
     print(f"Excel File Opened: {'Yes' if excel_opened else 'No'}")
     print(f"PDF Resume Validated: {'Yes' if pdf_validated else 'No'}")
 
+    # ----------------------------------------------------
+    # 9. POST /api/v1/job-descriptions/extract
+    # ----------------------------------------------------
+    print("\n--- 9. Testing POST /api/v1/job-descriptions/extract ---")
+    try:
+        with open(pdf1_path, "rb") as f1:
+            files = {"file": ("jd_test.pdf", f1, "application/pdf")}
+            r = requests.post(f"{BASE_URL}/api/v1/job-descriptions/extract", files=files)
+            if r.status_code == 200:
+                data = r.json()
+                if "text" in data and len(data["text"]) > 20:
+                    record_test("POST JD Extract (Valid PDF)", True, f"Successfully extracted {len(data['text'])} chars", r.status_code)
+                else:
+                    record_test("POST JD Extract (Valid PDF)", False, "No meaningful text returned", r.status_code)
+            else:
+                record_test("POST JD Extract (Valid PDF)", False, f"Expected 200, got {r.status_code}: {r.text}", r.status_code)
+                
+        # Test Invalid File
+        invalid_file_content = b"Not a PDF file"
+        files = {"file": ("invalid.txt", io.BytesIO(invalid_file_content), "text/plain")}
+        r_inv = requests.post(f"{BASE_URL}/api/v1/job-descriptions/extract", files=files)
+        if r_inv.status_code == 422:
+            record_test("POST JD Extract (Invalid Extension)", True, "Correctly rejected non-PDF extension", r_inv.status_code)
+        else:
+            record_test("POST JD Extract (Invalid Extension)", False, f"Expected 422, got {r_inv.status_code}", r_inv.status_code)
+            
+        # Test Corrupted PDF (has .pdf extension but invalid content)
+        files = {"file": ("corrupt.pdf", io.BytesIO(invalid_file_content), "application/pdf")}
+        r_cor = requests.post(f"{BASE_URL}/api/v1/job-descriptions/extract", files=files)
+        if r_cor.status_code == 422:
+            record_test("POST JD Extract (Corrupted PDF)", True, "Correctly rejected invalid PDF signature", r_cor.status_code)
+        else:
+            record_test("POST JD Extract (Corrupted PDF)", False, f"Expected 422, got {r_cor.status_code}", r_cor.status_code)
+
+    except Exception as e:
+        record_test("POST JD Extract", False, f"Request failed: {e}")
+
     print("\nTest Details:")
     print(f"{'Endpoint / Test Name':<45} | {'Status':<8} | {'HTTP':<6} | {'Details'}")
     print("-" * 100)

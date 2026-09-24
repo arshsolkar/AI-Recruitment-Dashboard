@@ -12,6 +12,35 @@ export interface AnalysisResponse {
   candidates: CandidateResponse[]
 }
 
+export interface CurrentResumeState {
+  filename: string
+  candidate_name: string | null
+}
+
+export interface CompletedResumeOut {
+  id: string
+  filename: string
+  candidate_name: string
+  ats_score: number
+}
+
+export interface AnalysisStatusResponse {
+  analysis_id: string
+  status: 'queued' | 'processing' | 'completed' | 'failed'
+  phase: 'text_extraction' | 'calculating_similarities' | 'ai_analysis' | 'completed' | 'failed' | null
+  current_stage: string | null
+  total: number
+  completed: number
+  phase_completed: number
+  phase_total: number
+  current_resume: CurrentResumeState | null
+  completed_resumes: CompletedResumeOut[]
+  started_at: string | null
+  current_resume_started_at: string | null
+  completed_at: string | null
+  error?: string | null
+}
+
 export interface CandidateResponse {
   id: string
   name: string
@@ -76,6 +105,16 @@ export async function getAnalysis(analysisId: string): Promise<AnalysisResponse>
   return response.json()
 }
 
+export async function getAnalysisStatus(analysisId: string): Promise<AnalysisStatusResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/analyses/${analysisId}/status`)
+  
+  if (!response.ok) {
+    throw new Error('Failed to fetch analysis status')
+  }
+
+  return response.json()
+}
+
 export async function downloadReport(analysisId: string): Promise<Blob> {
   const response = await fetch(`${API_BASE_URL}/api/v1/analyses/${analysisId}/report.xlsx`)
   
@@ -86,14 +125,14 @@ export async function downloadReport(analysisId: string): Promise<Blob> {
   return response.blob()
 }
 
-export async function getCandidateResume(candidateId: string): Promise<string> {
+export async function getCandidateResume(candidateId: string): Promise<Blob> {
   const response = await fetch(`${API_BASE_URL}/api/v1/candidates/${candidateId}/resume`)
   
   if (!response.ok) {
     throw new Error('Failed to fetch resume')
   }
 
-  return response.url
+  return response.blob()
 }
 
 export async function pollAnalysis(

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { pollAnalysis, type AnalysisResponse } from '../utils/api'
+import { getAnalysisStatus, getAnalysis, type AnalysisResponse, type AnalysisStatusResponse } from '../utils/api'
 
 interface AiScanningProps {
   analysisId: string
@@ -8,98 +8,149 @@ interface AiScanningProps {
   onError: (error: string) => void
 }
 
-const STAGES = [
-  { id: 1, label: 'Uploading & Preparing', detail: 'Initializing processing pipeline' },
-  { id: 2, label: 'Extracting Resume Data', detail: 'Processing PDF documents' },
-  { id: 3, label: 'Analyzing Skills', detail: 'Running NLP skill detection' },
-  { id: 4, label: 'Calculating ATS Score', detail: 'Vector embedding comparison' },
-  { id: 5, label: 'Generating Insights', detail: 'Building intelligence report' },
-]
+const formatTime = (secs: number) => {
+  if (isNaN(secs) || secs < 0 || !isFinite(secs)) return '--:--'
+  const m = Math.floor(secs / 60)
+  const s = Math.floor(secs % 60)
+  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+}
 
 export default function AiScanning({ analysisId, uploadedFiles, onComplete, onError }: AiScanningProps) {
-  const [analysis, setAnalysis] = useState<AnalysisResponse | null>(null)
-  const [elapsedSeconds, setElapsedSeconds] = useState(0)
-  const [currentStage, setCurrentStage] = useState(1)
+  const [statusState, setStatusState] = useState<AnalysisStatusResponse | null>(null)
+  const [now, setNow] = useState<number>(Date.now())
+  const [completedAnalysis, setCompletedAnalysis] = useState<AnalysisResponse | null>(null)
   
-  const startTimeRef = useRef<number>(Date.now())
-  
-  const status = analysis?.status || 'queued'
-  const total = analysis?.candidate_count || uploadedFiles.length || 0
+  const prevCompletedCountRef = useRef(0)
+  const completionTimesRef = useRef<number[]>([])
 
+  // Update time for elapsed counter
   useEffect(() => {
-    if (analysis?.created_at) {
-      startTimeRef.current = new Date(analysis.created_at).getTime()
-    }
-  }, [analysis?.created_at])
-
-  useEffect(() => {
-    if (status === 'completed' || status === 'failed') return
-    
-    const interval = setInterval(() => {
-      setElapsedSeconds(Math.floor((Date.now() - startTimeRef.current) / 1000))
-    }, 1000)
-    
+    const interval = setInterval(() => setNow(Date.now()), 1000)
     return () => clearInterval(interval)
-  }, [status])
+  }, [])
 
   useEffect(() => {
     if (!analysisId) return
 
-    pollAnalysis(
-      analysisId,
-      (updated) => setAnalysis(updated),
-      2000
-    )
-      .then((completedAnalysis) => {
-        setAnalysis(completedAnalysis)
-        setTimeout(() => onComplete(completedAnalysis), 1500)
-      })
-      .catch((error) => onError(error.message))
+    let isMounted = true
+    let timeoutId: NodeJS.Timeout | null = null
+
+    const poll = async () => {
+      try {
+        const state = await getAnalysisStatus(analysisId)
+        if (!isMounted) return
+
+        setStatusState(state)
+
+        if (state.status === 'completed') {
+          if (!completedAnalysis) {
+            const fullAnalysis = await getAnalysis(analysisId)
+            if (isMounted) setCompletedAnalysis(fullAnalysis)
+          }
+        } else if (state.status === 'failed') {
+          onError(state.error || 'Analysis failed during processing.')
+        } else {
+          timeoutId = setTimeout(poll, 750)
+        }
+      } catch (error: any) {
+        if (isMounted) {
+          onError(error.message || 'Error polling analysis status')
+        }
+      }
+    }
+
+    poll()
+
+    return () => {
+      isMounted = false
+      if (timeoutId) clearTimeout(timeoutId)
+    }
   }, [analysisId, onComplete, onError])
 
-  // Progress logic
-  const expectedTotalSeconds = total * 10
-  const recentCandidates = analysis?.candidates || []
-  const completedCount = status === 'completed' ? total : recentCandidates.length
-  const progressPct = total > 0 ? (completedCount / total) * 100 : 0
+  // Computed properties
+  const status = statusState?.status || 'queued'
+  const phase = statusState?.phase || 'text_extraction'
   
+  const total = statusState?.total || uploadedFiles.length || 0
+  const completedCount = statusState?.completed || 0
+  const overallProgress = total > 0 ? (completedCount / total) * 100 : 0
+  
+  const phaseTotal = statusState?.phase_total || 0
+  const phaseCompleted = statusState?.phase_completed || 0
+  const phaseProgress = phaseTotal > 0 ? (phaseCompleted / phaseTotal) * 100 : 0
+
   useEffect(() => {
-    if (status === 'completed') {
-      setCurrentStage(6)
-    } else if (status === 'processing') {
-      // Advance stages purely for visual feedback of the batch, NOT resume count
-      const progressRatio = Math.min(elapsedSeconds / Math.max(expectedTotalSeconds, 1), 0.95)
-      
-      if (progressRatio < 0.1) setCurrentStage(2)
-      else if (progressRatio < 0.4) setCurrentStage(3)
-      else if (progressRatio < 0.7) setCurrentStage(4)
-      else setCurrentStage(5)
+    if (completedCount > prevCompletedCountRef.current) {
+      const diff = completedCount - prevCompletedCountRef.current
+      for (let i = 0; i < diff; i++) {
+        completionTimesRef.current.push(Date.now())
+      }
+      prevCompletedCountRef.current = completedCount
     }
-  }, [elapsedSeconds, expectedTotalSeconds, status])
-  
-  const formatTime = (secs: number) => {
-    if (isNaN(secs) || secs < 0 || !isFinite(secs)) return '--:--'
-    const m = Math.floor(secs / 60)
-    const s = Math.floor(secs % 60)
-    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+  }, [completedCount])
+
+  // Time calculations
+  let elapsedSeconds = 0
+  if (statusState?.started_at) {
+    // Backend returns naive datetime from datetime.utcnow(). 
+    // We must treat it explicitly as UTC by appending 'Z' to avoid local timezone (e.g. IST) shifts.
+    const parseUtc = (dateStr: string) => {
+      if (!dateStr.endsWith('Z') && !dateStr.includes('+') && !dateStr.match(/-\d{2}:\d{2}$/)) {
+        return new Date(dateStr + 'Z').getTime()
+      }
+      return new Date(dateStr).getTime()
+    }
+    
+    const startMs = parseUtc(statusState.started_at)
+    
+    if (status === 'completed' && statusState.completed_at) {
+      // Final frozen elapsed time
+      elapsedSeconds = Math.max(0, (parseUtc(statusState.completed_at) - startMs) / 1000)
+    } else {
+      // Live processing elapsed time
+      elapsedSeconds = Math.max(0, (now - startMs) / 1000)
+    }
   }
 
   const avgSecsPerResume = completedCount > 0 ? elapsedSeconds / completedCount : 0
   const remainingResumes = total - completedCount
   
+  // Use rolling average if available
+  const times = completionTimesRef.current
+  let rollingAvgSecs = 0
+  if (times.length >= 2) {
+    const recent = times.slice(-6)
+    let sum = 0
+    for(let i=1; i<recent.length; i++) sum += (recent[i] - recent[i-1])/1000
+    rollingAvgSecs = sum / (recent.length - 1)
+  } else {
+    rollingAvgSecs = avgSecsPerResume
+  }
+
   let estimatedRemaining = '--:--'
+  let speedValue: string | React.ReactNode = 'Calculating...'
+  let speedSuffix = ''
+
   if (status === 'completed') {
     estimatedRemaining = '00:00'
-  } else if (completedCount >= 1 && avgSecsPerResume > 0) {
-    estimatedRemaining = '~' + formatTime(avgSecsPerResume * remainingResumes)
-  } else {
+    speedValue = completedCount > 0 ? ((completedCount / Math.max(elapsedSeconds, 1)) * 60).toFixed(1) : '...'
+    speedSuffix = 'candidates/min'
+  } else if (completedCount === 0) {
     estimatedRemaining = 'Calculating...'
+    speedValue = 'Calculating...'
+  } else if (completedCount === 1 && times.length === 1) {
+    estimatedRemaining = 'Estimating...'
+    speedValue = <span className="text-sm font-normal text-gray-500">Based on 1 completed candidate</span>
+  } else {
+    if (rollingAvgSecs > 0) {
+      estimatedRemaining = '~' + formatTime(rollingAvgSecs * remainingResumes)
+      speedValue = `~${(60 / rollingAvgSecs).toFixed(1)}`
+      speedSuffix = 'candidates/min'
+    } else {
+      estimatedRemaining = 'Estimating...'
+      speedValue = 'Calculating...'
+    }
   }
-  
-  const speed = completedCount > 0 ? ((completedCount / Math.max(elapsedSeconds, 1)) * 60).toFixed(1) : '...'
-
-  const currentResumeIndex = Math.min(completedCount, total - 1)
-  const currentResumeFilename = uploadedFiles[currentResumeIndex]?.name || `Resume_${currentResumeIndex + 1}.pdf`
 
   if (status === 'failed') {
     return (
@@ -113,19 +164,15 @@ export default function AiScanning({ analysisId, uploadedFiles, onComplete, onEr
             </svg>
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">Analysis Interrupted</h2>
-          <p className="text-gray-600 mb-6">{analysis?.error || 'Unable to complete resume processing.'}</p>
+          <p className="text-gray-600 mb-6">{statusState?.error || 'Unable to complete resume processing.'}</p>
           <div className="flex justify-between items-center bg-gray-50 p-4 rounded-lg mb-6 text-sm">
             <div>
               <div className="text-gray-500">Completed</div>
-              <div className="font-semibold">{completedCount} resumes</div>
-            </div>
-            <div>
-              <div className="text-gray-500">Remaining</div>
-              <div className="font-semibold">{remainingResumes} resumes</div>
+              <div className="font-semibold">{completedCount} / {total} candidates</div>
             </div>
           </div>
           <button 
-            onClick={() => onError(analysis?.error || 'Failed')}
+            onClick={() => onError(statusState?.error || 'Failed')}
             className="w-full py-2.5 bg-[#635BFF] text-white rounded-lg font-medium hover:bg-[#524BDE] transition-colors"
           >
             Start New Analysis
@@ -134,6 +181,40 @@ export default function AiScanning({ analysisId, uploadedFiles, onComplete, onEr
       </div>
     )
   }
+
+  // Phase Display formatting
+  const phaseLabels: Record<string, string> = {
+    'text_extraction': 'Text Extraction',
+    'calculating_similarities': 'Semantic Similarity Analysis',
+    'ai_analysis': 'AI Candidate Analysis',
+    'completed': 'Completed'
+  }
+  const currentPhaseLabel = phase ? phaseLabels[phase] || phase : 'Preparing'
+
+  // Pipeline Logic
+  const pipelineFlow = [
+    { id: 'text_extraction', label: 'Extraction' },
+    { id: 'calculating_similarities', label: 'Similarity' },
+    { id: 'ai_analysis', label: 'AI Analysis' },
+    { id: 'completed', label: 'Completed' }
+  ]
+  
+  const currentPhaseIndex = pipelineFlow.findIndex(p => p.id === phase)
+
+  // Current Resume / Stage formatting
+  const currentResume = statusState?.current_resume
+  const currentStage = statusState?.current_stage
+
+  const stageLabels: Record<string, string> = {
+    'extracting_text': 'Extracting resume text...',
+    'calculating_similarities': 'Calculating semantic similarities...',
+    'analyzing_skills': 'Analyzing Skills',
+    'calculating_score': 'Calculating Score',
+    'generating_insights': 'Generating Insights',
+    'completed': 'Completed'
+  }
+  
+  const displayStage = currentStage ? stageLabels[currentStage] || currentStage : ''
 
   return (
     <div className="min-h-screen bg-[#F7F8FA] flex flex-col items-center py-12 px-6 overflow-y-auto">
@@ -153,25 +234,23 @@ export default function AiScanning({ analysisId, uploadedFiles, onComplete, onEr
           </div>
         </div>
 
-        {/* Main Progress Card */}
+        {/* Overall Progress Card */}
         <div className="bg-white rounded-2xl p-8 shadow-sm border border-[#E5E7EB]">
           <div className="flex justify-between items-end mb-4">
             <div>
-              <div className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-1">AI Analysis Progress</div>
-              <div className="text-4xl font-bold text-gray-900">{Math.round(progressPct)}%</div>
+              <div className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-1">Overall Progress</div>
+              <div className="text-4xl font-bold text-gray-900">{Math.round(overallProgress)}%</div>
             </div>
             <div className="text-gray-600 font-medium">
-              {completedCount} of {total} resumes processed
+              {completedCount} / {total} candidates completed
             </div>
           </div>
           
           <div className="w-full bg-[#F3F4F6] rounded-full h-3 mb-8 overflow-hidden relative">
             <div 
-              className="h-full bg-gradient-to-r from-[#635BFF] to-[#8B84FF] transition-all duration-500 ease-out relative"
-              style={{ width: `${progressPct}%` }}
-            >
-              <div className="absolute inset-0 bg-white/20" style={{ animation: 'progress-shine 2s infinite linear' }} />
-            </div>
+              className="h-full bg-gradient-to-r from-[#635BFF] to-[#8B84FF] transition-all duration-300 ease-out"
+              style={{ width: `${overallProgress}%` }}
+            />
           </div>
 
           <div className="grid grid-cols-3 gap-6 divide-x divide-[#E5E7EB]">
@@ -185,25 +264,78 @@ export default function AiScanning({ analysisId, uploadedFiles, onComplete, onEr
             </div>
             <div className="pl-6">
               <div className="text-sm text-gray-500 mb-1">Processing Speed</div>
-              <div className="text-xl font-semibold text-gray-900">{speed} <span className="text-sm font-normal text-gray-500">resumes/min</span></div>
+              <div className="text-xl font-semibold text-gray-900">
+                {speedValue} {speedSuffix && <span className="text-sm font-normal text-gray-500">{speedSuffix}</span>}
+              </div>
             </div>
           </div>
           
           {status === 'completed' && (
-            <div className="mt-8 pt-6 border-t border-gray-100 flex justify-center animate-fade-in-up">
-              <button className="flex items-center gap-2 px-6 py-3 bg-[#635BFF] text-white rounded-xl font-medium hover:bg-[#524BDE] transition-all hover-lift">
-                View Results 
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M3.33331 8H12.6666" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M8 3.33331L12.6667 7.99998L8 12.6666" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </button>
-            </div>
+             <div className="mt-8 pt-6 border-t border-gray-100 flex justify-center animate-fade-in-up">
+             <div className="text-center">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Analysis Complete</h3>
+                <p className="text-gray-500 mb-4">{total} / {total} candidates analyzed</p>
+                <button 
+                  onClick={() => completedAnalysis && onComplete(completedAnalysis)}
+                  disabled={!completedAnalysis}
+                  className="flex items-center gap-2 px-6 py-3 bg-[#635BFF] text-white rounded-xl font-medium hover:bg-[#524BDE] transition-all hover-lift mx-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  View Results 
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M3.33331 8H12.6666" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M8 3.33331L12.6667 7.99998L8 12.6666" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+             </div>
+           </div>
           )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Currently Processing */}
+          
+          {/* Current Phase / Pipeline */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#E5E7EB] flex flex-col gap-6">
+            <div>
+              <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-2">Current Phase</h2>
+              <div className="text-xl font-semibold text-[#635BFF] mb-2">{currentPhaseLabel}</div>
+              <div className="flex justify-between items-center text-sm font-medium text-gray-600 mb-2">
+                <span>{phaseCompleted} / {phaseTotal} {phase === 'text_extraction' ? 'resumes extracted' : 'processed'}</span>
+                <span>{Math.round(phaseProgress)}%</span>
+              </div>
+              <div className="w-full bg-[#E5E7EB] rounded-full h-2 overflow-hidden">
+                <div 
+                  className="h-full bg-[#635BFF] transition-all duration-300"
+                  style={{ width: `${phaseProgress}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="border-t border-gray-100 pt-6">
+              <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Processing Flow</h3>
+              <div className="space-y-4">
+                {pipelineFlow.map((step, idx) => {
+                  const isComplete = currentPhaseIndex > idx || status === 'completed'
+                  const isActive = currentPhaseIndex === idx && status !== 'completed'
+                  
+                  return (
+                    <div key={step.id} className="flex items-center gap-3">
+                      <div className={`flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full border-2 ${
+                        isComplete ? 'bg-[#10B981] border-[#10B981]' : isActive ? 'bg-white border-[#635BFF]' : 'bg-white border-gray-200'
+                      }`}>
+                         {isComplete && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                         {isActive && <div className="w-2.5 h-2.5 rounded-full bg-[#635BFF]" />}
+                      </div>
+                      <span className={`text-sm font-medium ${isComplete || isActive ? 'text-gray-900' : 'text-gray-400'}`}>
+                        {step.label}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Currently Processing Resume */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#E5E7EB] flex flex-col">
             <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-6">Currently Processing</h2>
             
@@ -216,8 +348,12 @@ export default function AiScanning({ analysisId, uploadedFiles, onComplete, onEr
                   </svg>
                 </div>
                 <h3 className="text-lg font-medium text-gray-900">All resumes processed</h3>
-                <p className="text-gray-500 text-sm mt-1">Ready for review</p>
               </div>
+            ) : currentResume == null ? (
+               <div className="flex-1 flex flex-col justify-center items-center text-center bg-gray-50/50 rounded-xl border border-dashed border-gray-200 p-6">
+                 <div className="text-gray-500 font-medium mb-2">No individual resume currently active</div>
+                 <div className="text-sm text-gray-400">{displayStage || 'Batch operation in progress...'}</div>
+               </div>
             ) : (
               <div className="border border-[#E5E7EB] rounded-xl p-5 flex-1 relative overflow-hidden bg-gray-50/50">
                 <div className="absolute top-0 left-0 w-1 h-full bg-[#635BFF]"></div>
@@ -225,8 +361,8 @@ export default function AiScanning({ analysisId, uploadedFiles, onComplete, onEr
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <div className="text-xs text-gray-500 font-medium mb-1">FILE</div>
-                    <div className="font-mono text-sm font-semibold text-gray-900 bg-white px-2 py-1 border border-gray-200 rounded inline-block">
-                      {currentResumeFilename}
+                    <div className="font-mono text-sm font-semibold text-gray-900 bg-white px-2 py-1 border border-gray-200 rounded inline-block truncate max-w-[250px]">
+                      {currentResume.filename}
                     </div>
                   </div>
                 </div>
@@ -234,70 +370,23 @@ export default function AiScanning({ analysisId, uploadedFiles, onComplete, onEr
                 <div className="mb-6">
                   <div className="text-xs text-gray-500 font-medium mb-1">CANDIDATE</div>
                   <div className="text-base font-medium text-gray-900">
-                    {completedCount === 0 ? 'Batch processing resumes...' : 'Extracting candidate information...'}
+                    {currentResume.candidate_name || 'Candidate information being extracted...'}
                   </div>
                 </div>
 
-                <div>
-                  <div className="flex justify-between items-end mb-2">
-                    <div className="text-sm font-medium text-[#635BFF]">
-                      {STAGES.find(s => s.id === currentStage)?.label || 'Processing'}
-                    </div>
-                    <div className="text-xs font-medium text-gray-500">
-                      Stage {Math.min(currentStage, 5)} of 5
-                    </div>
-                  </div>
-                  <div className="w-full bg-[#E5E7EB] rounded-full h-1.5 mb-1 overflow-hidden">
-                    <div 
-                      className="h-full bg-[#635BFF] transition-all duration-300"
-                      style={{ width: `${(Math.min(currentStage, 5) / 5) * 100}%` }}
-                    />
-                  </div>
+                <div className="flex items-center gap-2">
+                   <div className="w-2.5 h-2.5 rounded-full bg-[#635BFF] animate-pulse" />
+                   <span className="text-sm font-medium text-[#635BFF]">{displayStage}</span>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Processing Pipeline */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#E5E7EB]">
-            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-6">Processing Pipeline</h2>
-            <div className="space-y-6 relative">
-              <div className="absolute left-2.5 top-3 bottom-4 w-px bg-[#E5E7EB]"></div>
-              
-              {STAGES.map((stage) => {
-                const isComplete = currentStage > stage.id || status === 'completed'
-                const isActive = currentStage === stage.id && status !== 'completed'
-                
-                return (
-                  <div key={stage.id} className="flex items-start gap-4 relative z-10">
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                      isComplete ? 'bg-[#10B981]' : isActive ? 'bg-white border-2 border-[#635BFF]' : 'bg-white border-2 border-[#E5E7EB]'
-                    }`}>
-                      {isComplete && (
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                      )}
-                      {isActive && <div className="w-2 h-2 rounded-full bg-[#635BFF] animate-pulse"></div>}
-                    </div>
-                    
-                    <div>
-                      <h4 className={`text-sm font-medium ${isComplete || isActive ? 'text-gray-900' : 'text-gray-400'}`}>
-                        {stage.label}
-                      </h4>
-                      <p className={`text-xs mt-0.5 ${isComplete || isActive ? 'text-gray-500' : 'text-gray-400'}`}>
-                        {stage.detail}
-                      </p>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
         </div>
 
         {/* Bottom row: Queue & Completed */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
           {/* Queue */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#E5E7EB] lg:col-span-1">
             <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 flex justify-between">
@@ -306,27 +395,27 @@ export default function AiScanning({ analysisId, uploadedFiles, onComplete, onEr
             </h2>
             <div className="space-y-2 max-h-[240px] overflow-y-auto pr-2">
               {uploadedFiles.map((file, idx) => {
-                const isProcessed = idx < completedCount
-                const isProcessing = idx === currentResumeIndex && status !== 'completed'
+                const isCompleted = (statusState?.completed_resumes || []).some(r => r.filename === file.name)
+                const isCurrent = currentResume?.filename === file.name
                 
                 return (
                   <div key={idx} className={`flex items-center gap-3 p-2 rounded-lg text-sm ${
-                    isProcessing ? 'bg-[#EEF0FF] border border-[#C7D2FE]' : 'border border-transparent'
+                    isCurrent ? 'bg-[#EEF0FF] border border-[#C7D2FE]' : 'border border-transparent'
                   }`}>
-                    {isProcessed ? (
+                    {isCompleted ? (
                       <div className="text-[#10B981] flex-shrink-0">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                       </div>
-                    ) : isProcessing ? (
+                    ) : isCurrent ? (
                       <div className="text-[#635BFF] flex-shrink-0">
-                        <div className="w-4 h-4 border-2 border-[#635BFF] border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-3 h-3 bg-[#635BFF] rounded-full mx-0.5 animate-pulse"></div>
                       </div>
                     ) : (
                       <div className="w-4 h-4 rounded-full border-2 border-[#E5E7EB] flex-shrink-0"></div>
                     )}
                     <span className={`truncate font-mono text-xs ${
-                      isProcessing ? 'text-[#635BFF] font-semibold' : 
-                      isProcessed ? 'text-gray-600' : 'text-gray-400'
+                      isCurrent ? 'text-[#635BFF] font-semibold' : 
+                      isCompleted ? 'text-gray-600' : 'text-gray-400'
                     }`}>
                       {file.name}
                     </span>
@@ -341,7 +430,7 @@ export default function AiScanning({ analysisId, uploadedFiles, onComplete, onEr
             <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
               Recently Completed
             </h2>
-            {recentCandidates.length === 0 ? (
+            {!(statusState?.completed_resumes?.length) ? (
               <div className="flex flex-col items-center justify-center h-[200px] text-gray-400 bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="mb-2">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -363,17 +452,17 @@ export default function AiScanning({ analysisId, uploadedFiles, onComplete, onEr
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {recentCandidates.map((c) => (
+                    {statusState.completed_resumes.map((c) => (
                       <tr key={c.id} className="hover:bg-gray-50 animate-fade-in-up">
                         <td className="py-3 font-medium text-gray-900 flex items-center gap-2">
                           <div className="w-6 h-6 rounded-full bg-[#10B981]/10 text-[#10B981] flex items-center justify-center flex-shrink-0">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                           </div>
-                          {c.name}
+                          {c.candidate_name || 'Unknown Candidate'}
                         </td>
                         <td className="py-3">
                           <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#EEF0FF] text-[#635BFF]">
-                            {c.overall_score}% ATS
+                            {c.ats_score}% ATS
                           </span>
                         </td>
                         <td className="py-3 font-mono text-xs text-gray-500 truncate max-w-[150px]">

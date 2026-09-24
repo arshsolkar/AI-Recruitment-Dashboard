@@ -16,6 +16,17 @@ class Analysis(Base):
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    
+    # Real-time processing state
+    total_resumes: Mapped[int] = mapped_column(Integer, default=0)
+    current_phase: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    current_stage: Mapped[str] = mapped_column(String(50), default="preparing")
+    current_resume_filename: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    current_resume_candidate_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    current_resume_started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    phase_completed: Mapped[int] = mapped_column(Integer, default=0)
+    phase_total: Mapped[int] = mapped_column(Integer, default=0)
+    
     candidates: Mapped[list["Candidate"]] = relationship(back_populates="analysis", cascade="all, delete-orphan")
 
 

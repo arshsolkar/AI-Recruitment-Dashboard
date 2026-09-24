@@ -19,11 +19,20 @@ def analyse_job(analysis_id: str, upload_paths: list[tuple[str, str]]) -> None:
         if not analysis:
             return
         analysis.status = "processing"
+        analysis.current_phase = "text_extraction"
+        analysis.phase_total = len(upload_paths)
+        analysis.phase_completed = 0
         db.commit()
 
         parsed: list[tuple[str, str, str]] = []
         skipped: list[str] = []
         for filename, path in upload_paths:
+            analysis.current_resume_filename = filename
+            analysis.current_resume_candidate_name = None
+            analysis.current_resume_started_at = datetime.utcnow()
+            analysis.current_stage = "extracting_text"
+            db.commit()
+            
             try:
                 text = extract_pdf_text(path)
                 if len(text) < 40:
@@ -31,6 +40,9 @@ def analyse_job(analysis_id: str, upload_paths: list[tuple[str, str]]) -> None:
                 parsed.append((filename, text, path))
             except Exception as exc:
                 skipped.append(f"{filename}: {exc}")
+                
+            analysis.phase_completed += 1
+            db.commit()
 
         if not parsed:
             details = "; ".join(skipped[:5])
@@ -48,9 +60,31 @@ def analyse_job(analysis_id: str, upload_paths: list[tuple[str, str]]) -> None:
         }
         
         # Calculate semantic similarities with normalization
+        analysis.current_phase = "calculating_similarities"
+        analysis.current_stage = "calculating_similarities"
+        analysis.current_resume_filename = None
+        analysis.current_resume_candidate_name = None
+        analysis.phase_total = len(parsed)
+        analysis.phase_completed = 0
+        db.commit()
+        
         similarities = semantic_similarities(analysis.job_description, [text for _, text, _ in parsed])
+        
+        analysis.phase_completed = len(parsed)
+        db.commit()
+        
+        analysis.current_phase = "ai_analysis"
+        analysis.phase_total = len(parsed)
+        analysis.phase_completed = 0
+        db.commit()
 
         for (filename, text, path), similarity in zip(parsed, similarities):
+            analysis.current_resume_filename = filename
+            analysis.current_resume_candidate_name = None
+            analysis.current_resume_started_at = datetime.utcnow()
+            analysis.current_stage = "analyzing_skills"
+            db.commit()
+            
             # Use Ollama-based structured extraction for all metadata
             try:
                 ollama_data = extract_resume_data_ollama(text, path)
@@ -80,6 +114,10 @@ def analyse_job(analysis_id: str, upload_paths: list[tuple[str, str]]) -> None:
             # Ensure experience_details is in the right format for database
             if not isinstance(experience_details, list):
                 experience_details = []
+            
+            analysis.current_resume_candidate_name = candidate_name
+            analysis.current_stage = "calculating_score"
+            db.commit()
             
             # Ensure projects is a list
             if not isinstance(projects, list):
@@ -136,6 +174,9 @@ def analyse_job(analysis_id: str, upload_paths: list[tuple[str, str]]) -> None:
             score_label = recommendation(overall)
             
             # Generate structured, detailed insight
+            analysis.current_stage = "generating_insights"
+            db.commit()
+            
             insight_parts = []
             
             # Overall assessment
@@ -201,7 +242,15 @@ def analyse_job(analysis_id: str, upload_paths: list[tuple[str, str]]) -> None:
                 recommendation=score_label, insight=insight,
                 requires_manual_name_entry=requires_manual_entry,
             ))
+            
+            analysis.phase_completed += 1
+            db.commit()
+            
         analysis.status = "completed"
+        analysis.current_phase = "completed"
+        analysis.current_stage = "completed"
+        analysis.current_resume_filename = None
+        analysis.current_resume_candidate_name = None
         # An analysis can be useful even if individual documents were unreadable.
         analysis.error = f"Skipped {len(skipped)} file(s): " + "; ".join(skipped[:5]) if skipped else None
         analysis.completed_at = datetime.utcnow()
@@ -211,6 +260,8 @@ def analyse_job(analysis_id: str, upload_paths: list[tuple[str, str]]) -> None:
         analysis = db.get(Analysis, analysis_id)
         if analysis:
             analysis.status = "failed"
+            analysis.current_phase = "failed"
+            analysis.current_stage = "failed"
             analysis.error = str(exc)
             db.commit()
     finally:

@@ -634,26 +634,48 @@ function AnalyticsTab({ candidates }: { candidates: Candidate[] }) {
   const variance = matchScores.length > 0 ? matchScores.reduce((sum, score) => sum + Math.pow(score - mean, 2), 0) / matchScores.length : 0
   const stdDev = Math.sqrt(variance)
 
-  // Calculate actual skill correlations from candidate data
-  const allSkills = Array.from(new Set(candidates.flatMap(c => c.skills))).slice(0, 9)
-  const correlationMatrix = allSkills.slice(0, 4).map(skill1 => {
+  const validCandidates = candidates.filter(c => c.experience && !isNaN(parseInt(c.experience)) && c.match > 0)
+  const hasEnoughData = validCandidates.length >= 2
+
+  const allSkills = Array.from(new Set(validCandidates.flatMap(c => c.skills))).slice(0, 9)
+  const correlationMatrix = hasEnoughData ? allSkills.slice(0, 4).map(skill1 => {
     return allSkills.slice(0, 4).map(skill2 => {
       if (skill1 === skill2) return 1.0
       
-      const candidatesWithSkill1 = candidates.filter(c => c.skills.includes(skill1))
-      const candidatesWithSkill2 = candidates.filter(c => c.skills.includes(skill2))
-      const candidatesWithBoth = candidates.filter(c => c.skills.includes(skill1) && c.skills.includes(skill2))
+      const candidatesWithSkill1 = validCandidates.filter(c => c.skills.includes(skill1))
+      const candidatesWithSkill2 = validCandidates.filter(c => c.skills.includes(skill2))
+      const candidatesWithBoth = validCandidates.filter(c => c.skills.includes(skill1) && c.skills.includes(skill2))
       
       if (candidatesWithSkill1.length === 0 || candidatesWithSkill2.length === 0) return 0
       
       // Simple correlation based on co-occurrence
-      const expectedBoth = (candidatesWithSkill1.length / candidates.length) * (candidatesWithSkill2.length / candidates.length) * candidates.length
+      const expectedBoth = (candidatesWithSkill1.length / validCandidates.length) * (candidatesWithSkill2.length / validCandidates.length) * validCandidates.length
       const actualBoth = candidatesWithBoth.length
       const correlation = actualBoth / Math.max(expectedBoth, 1)
       
       return Math.min(correlation, 1.0)
     })
-  })
+  }) : []
+
+  // Calculate Experience vs Performance Correlation
+  let expPerfCorrelation = 0
+  if (hasEnoughData) {
+    const meanExp = validCandidates.reduce((sum, c) => sum + parseInt(c.experience), 0) / validCandidates.length
+    const meanMatch = validCandidates.reduce((sum, c) => sum + c.match, 0) / validCandidates.length
+    let num = 0
+    let den1 = 0
+    let den2 = 0
+    for (const c of validCandidates) {
+      const expDiff = parseInt(c.experience) - meanExp
+      const matchDiff = c.match - meanMatch
+      num += expDiff * matchDiff
+      den1 += expDiff * expDiff
+      den2 += matchDiff * matchDiff
+    }
+    if (den1 > 0 && den2 > 0) {
+      expPerfCorrelation = num / Math.sqrt(den1 * den2)
+    }
+  }
 
   return (
     <div className="p-6 animate-fade-in-up">
@@ -669,7 +691,7 @@ function AnalyticsTab({ candidates }: { candidates: Candidate[] }) {
             <h3 className="text-[15px] font-700 text-[#111827]">Experience vs Performance Correlation</h3>
             <div className="flex items-center gap-2 text-[10px]">
               <span className="text-[#6B7280]">Correlation:</span>
-              <span className="font-700 text-[#635BFF]">r = 0.62</span>
+              <span className="font-700 text-[#635BFF]">{hasEnoughData ? `r = ${expPerfCorrelation.toFixed(2)}` : 'Insufficient data'}</span>
             </div>
           </div>
           <div className="relative h-80 bg-[#F7F8FA] rounded-lg p-4">
@@ -940,94 +962,101 @@ function AnalyticsTab({ candidates }: { candidates: Candidate[] }) {
 
       <div className="grid grid-cols-3 gap-6">
         {/* 3. Comprehensive Skill Correlation Heatmap */}
-        <div className="bg-white rounded-lg border border-[#E5E7EB] p-6">
+        <div className="bg-white rounded-lg border border-[#E5E7EB] p-6 flex flex-col">
           <h3 className="text-[15px] font-700 text-[#111827] mb-4">Skill Correlation Matrix</h3>
-          <div className="relative">
-            <svg className="w-full h-48" viewBox="0 0 280 180">
-              {allSkills.slice(0, 5).map((skill, rowIdx) => (
-                <g key={skill}>
-                  {/* Row label */}
-                  <text
-                    x="25"
-                    y={30 + rowIdx * 30}
-                    textAnchor="end"
-                    className="text-[9px] fill-[#6B7280] font-600"
-                  >
-                    {skill.slice(0, 6)}
-                  </text>
-                  
-                  {allSkills.slice(0, 5).map((_, colIdx) => {
-                    const correlation = correlationMatrix[rowIdx]?.[colIdx] || 0
-                    const intensity = Math.abs(correlation)
-                    const bgColor = correlation > 0 
-                      ? `rgba(16, 185, 129, ${Math.max(intensity, 0.15)})` 
-                      : `rgba(239, 68, 68, ${Math.max(intensity, 0.15)})`
-                    const textColor = intensity > 0.6 ? 'white' : '#111827'
-                    
-                    return (
-                      <rect
-                        key={colIdx}
-                        x={35 + colIdx * 45}
-                        y={12 + rowIdx * 30}
-                        width="40"
-                        height="24"
-                        fill={bgColor}
-                        rx="2"
-                      />
-                    )
-                  })}
-                </g>
-              ))}
-              
-              {/* Column labels */}
-              {allSkills.slice(0, 5).map((skill, colIdx) => (
-                <text
-                  key={skill}
-                  x={55 + colIdx * 45}
-                  y="10"
-                  textAnchor="middle"
-                  className="text-[9px] fill-[#6B7280] font-600"
-                >
-                  {skill.slice(0, 6)}
-                </text>
-              ))}
-              
-              {/* Correlation values */}
-              {allSkills.slice(0, 5).map((_, rowIdx) => (
-                allSkills.slice(0, 5).map((_, colIdx) => {
-                  const correlation = correlationMatrix[rowIdx]?.[colIdx] || 0
-                  const intensity = Math.abs(correlation)
-                  const textColor = intensity > 0.6 ? 'white' : '#111827'
-                  
-                  return (
-                    <text
-                      key={`${rowIdx}-${colIdx}`}
-                      x={55 + colIdx * 45}
-                      y={28 + rowIdx * 30}
-                      textAnchor="middle"
-                      className="text-[8px] font-600"
-                      style={{ fill: textColor }}
-                    >
-                      {correlation.toFixed(2)}
-                    </text>
-                  )
-                })
-              ))}
-            </svg>
-          </div>
-          <div className="mt-4 flex items-center justify-between text-[10px] text-[#6B7280]">
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-[#10B981]" />
-                <span>Positive</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-[#EF4444]" />
-                <span>Negative</span>
-              </div>
+          {!hasEnoughData ? (
+            <div className="flex-1 flex items-center justify-center text-sm text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+              Insufficient data for correlation analysis
             </div>
-            <span>Based on skill co-occurrence</span>
-          </div>
+          ) : (
+            <>
+              <div className="relative">
+                <svg className="w-full h-48" viewBox="0 0 280 180">
+                  {allSkills.slice(0, 5).map((skill, rowIdx) => (
+                    <g key={skill}>
+                      {/* Row label */}
+                      <text
+                        x="25"
+                        y={30 + rowIdx * 30}
+                        textAnchor="end"
+                        className="text-[9px] fill-[#6B7280] font-600"
+                      >
+                        {skill.slice(0, 6)}
+                      </text>
+                      
+                      {allSkills.slice(0, 5).map((_, colIdx) => {
+                        const correlation = correlationMatrix[rowIdx]?.[colIdx] || 0
+                        const intensity = Math.abs(correlation)
+                        const bgColor = correlation > 0 
+                          ? `rgba(16, 185, 129, ${Math.max(intensity, 0.15)})` 
+                          : `rgba(239, 68, 68, ${Math.max(intensity, 0.15)})`
+                        
+                        return (
+                          <rect
+                            key={colIdx}
+                            x={35 + colIdx * 45}
+                            y={12 + rowIdx * 30}
+                            width="40"
+                            height="24"
+                            fill={bgColor}
+                            rx="2"
+                          />
+                        )
+                      })}
+                    </g>
+                  ))}
+                  
+                  {/* Column labels */}
+                  {allSkills.slice(0, 5).map((skill, colIdx) => (
+                    <text
+                      key={skill}
+                      x={55 + colIdx * 45}
+                      y="10"
+                      textAnchor="middle"
+                      className="text-[9px] fill-[#6B7280] font-600"
+                    >
+                      {skill.slice(0, 6)}
+                    </text>
+                  ))}
+                  
+                  {/* Correlation values */}
+                  {allSkills.slice(0, 5).map((_, rowIdx) => (
+                    allSkills.slice(0, 5).map((_, colIdx) => {
+                      const correlation = correlationMatrix[rowIdx]?.[colIdx] || 0
+                      const intensity = Math.abs(correlation)
+                      const textColor = intensity > 0.6 ? 'white' : '#111827'
+                      
+                      return (
+                        <text
+                          key={`${rowIdx}-${colIdx}`}
+                          x={55 + colIdx * 45}
+                          y={28 + rowIdx * 30}
+                          textAnchor="middle"
+                          className="text-[8px] font-600"
+                          style={{ fill: textColor }}
+                        >
+                          {correlation.toFixed(2)}
+                        </text>
+                      )
+                    })
+                  ))}
+                </svg>
+              </div>
+              <div className="mt-4 flex items-center justify-between text-[10px] text-[#6B7280]">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 bg-[#10B981]" />
+                    <span>Positive</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 bg-[#EF4444]" />
+                    <span>Negative</span>
+                  </div>
+                </div>
+                <span>Based on skill co-occurrence</span>
+              </div>
+            </>
+          )}
         </div>
 
         {/* 4. Large Radar Chart for Top Candidates */}
@@ -1245,18 +1274,32 @@ function JobAnalysisTab({ currentAnalysis }: { currentAnalysis: any }) {
   const requirementsData = currentAnalysis?.requirements
   let requirements = []
 
+  const candidates = currentAnalysis?.candidates || []
+  const totalCandidates = candidates.length
+
+  const getMatchCount = (req: string) => {
+    let count = 0
+    const reqLower = req.toLowerCase()
+    for (const c of candidates) {
+      if (c.skills?.some((s: string) => s.toLowerCase().includes(reqLower) || reqLower.includes(s.toLowerCase()))) {
+        count++
+      }
+    }
+    return count
+  }
+
   if (Array.isArray(requirementsData)) {
     // Old format: simple array
     requirements = requirementsData.map((req: string) => ({
       req,
-      weight: 'High',
-      matched: 0
+      weight: 'High' as const,
+      matched: getMatchCount(req)
     }))
   } else if (requirementsData && typeof requirementsData === 'object') {
     // New format: dict with required and preferred
     const allReqs = [
-      ...(requirementsData.required || []).map((req: string) => ({ req, weight: 'High' as const, matched: 0 })),
-      ...(requirementsData.preferred || []).map((req: string) => ({ req, weight: 'Medium' as const, matched: 0 }))
+      ...(requirementsData.required || []).map((req: string) => ({ req, weight: 'High' as const, matched: getMatchCount(req) })),
+      ...(requirementsData.preferred || []).map((req: string) => ({ req, weight: 'Medium' as const, matched: getMatchCount(req) }))
     ]
     requirements = allReqs
   }
@@ -1285,7 +1328,7 @@ function JobAnalysisTab({ currentAnalysis }: { currentAnalysis: any }) {
                 </span>
                 <div className="flex items-center gap-1.5 text-[12px] text-[#6B7280]">
                   <span className="font-600 text-[#10B981]">{r.matched}</span>
-                  <span>/ 8 matched</span>
+                  <span>/ {totalCandidates} matched</span>
                 </div>
               </div>
             ))}
